@@ -266,7 +266,6 @@ public class RobotContainer {
   }
 
   public void colorReceived(Alliance ally) {
-    SmartDashboard.putString("ally", ally.toString());
     if (Utils.isSimulation()) {
       if (ally == Alliance.Blue) {
         // In sim when we go near the spearker / amp trigger a note release
