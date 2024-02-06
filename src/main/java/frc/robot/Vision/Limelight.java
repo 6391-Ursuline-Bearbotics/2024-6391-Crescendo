@@ -8,6 +8,9 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,6 +30,9 @@ public class Limelight extends SubsystemBase {
   private Pose2d botpose;
   private static final RectanglePoseArea field =
         new RectanglePoseArea(new Translation2d(0.0, 0.0), new Translation2d(16.54, 8.02));
+
+  private final NetworkTable table = NetworkTableInstance.getDefault().getTable("Pose");
+  private final DoubleArrayPublisher limelightPub = table.getDoubleArrayTopic("llPose").publish();
 
   /** Creates a new Limelight. */
   public Limelight(CommandSwerveDrivetrain drivetrain, String ll, Boolean tagmode) {
@@ -50,6 +56,11 @@ public class Limelight extends SubsystemBase {
             LimelightHelpers.getLatestResults(ll).targetingResults;
         if (result.valid) {
           botpose = LimelightHelpers.getBotPose2d_wpiBlue(ll);
+          limelightPub.set(new double[] {
+            botpose.getX(),
+            botpose.getY(),
+            botpose.getRotation().getDegrees()
+          });
           if (field.isPoseWithinArea(botpose)) {
             if (drivetrain.getState().Pose.getTranslation().getDistance(botpose.getTranslation()) < 0.5
                 || trust

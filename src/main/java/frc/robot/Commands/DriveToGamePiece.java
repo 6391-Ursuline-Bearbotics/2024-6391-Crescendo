@@ -8,6 +8,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.CommandSwerveDrivetrain;
 import frc.robot.Constants;
@@ -45,9 +46,11 @@ public class DriveToGamePiece extends Command {
   public void execute() {
 		if (ll.hasTarget()){
       setpoint = Math.toRadians(-ll.getNoteHorizontal())+ drivetrain.getState().Pose.getRotation().getRadians();
+      SmartDashboard.putNumber("Game Piece setpoint", setpoint)
 			thetaController.setSetpoint(setpoint);
       if (!thetaController.atSetpoint() ){
 				thetaOutput = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);
+        SmartDashboard.putNumber("theta output", thetaOutput);
 			}
 		}
     
