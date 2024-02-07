@@ -37,6 +37,7 @@ import frc.robot.Util.InterpolatingTable;
 import frc.robot.Util.RectanglePoseArea;
 import frc.robot.Util.RoboticPathing;
 import frc.robot.Util.ShotParameter;
+import frc.robot.Vision.Detector;
 import frc.robot.Vision.Limelight;
 import frc.robot.generated.TunerConstants;
 
@@ -53,8 +54,8 @@ public class RobotContainer {
   /* Setting up bindings for necessary control of the swerve drive platform */
   CommandXboxPS5Controller drv = new CommandXboxPS5Controller(0); // driver xbox controller
   CommandXboxPS5Controller op = new CommandXboxPS5Controller(1); // operator xbox controller
-  CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // drivetrain
-  RoboticPathing robo = new RoboticPathing();  
+  CommandSwerveDrivetrain drivetrain;
+  RoboticPathing robo;  
 
   // Slew Rate Limiters to limit acceleration of joystick inputs
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(2);
@@ -63,8 +64,8 @@ public class RobotContainer {
 
   // Starting the other subsystems
   private final LEDSubsystem lights = new LEDSubsystem();
-  private final Limelight intakeCamera = new Limelight(drivetrain, "intake", false);
-  private final Limelight shooterCamera = new Limelight(drivetrain, "shooter", true);
+  private final Detector intakeCamera = new Detector("limelight-note");
+  private final Limelight shooterCamera;
   private final Arm arm = new Arm();
   private final Shooter shooter = new Shooter();
   private final Intake intake = new Intake();
@@ -175,6 +176,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("armAmpPosition", arm.setAmpPosition());
     NamedCommands.registerCommand("intakeOn", intake.intakeOn());
     NamedCommands.registerCommand("intakeOff", intake.intakeOff());
+
+    drivetrain = TunerConstants.DriveTrain; // Make Drivetrain after Named Commands
+    robo = new RoboticPathing();
+    shooterCamera = new Limelight(drivetrain, "limelight");
 
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();

@@ -11,19 +11,19 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.CommandSwerveDrivetrain;
 import frc.robot.Constants;
-import frc.robot.Vision.Limelight;
+import frc.robot.Vision.Detector;
 import frc.robot.generated.TunerConstants;
 
 /** Add your docs here. */
 public class StrafeToGamePiece extends Command {
 
-  private Limelight ll;
+  private Detector ll;
   private CommandSwerveDrivetrain drivetrain;
   private PIDController yController = new PIDController(0.1, 0, 0);
-  public StrafeToGamePiece(CommandSwerveDrivetrain drivetrain, Limelight Limelight) {
+  public StrafeToGamePiece(CommandSwerveDrivetrain drivetrain, Detector ll) {
     addRequirements(drivetrain);
     this.drivetrain = drivetrain;
-    ll = Limelight;
+    this.ll = ll;
   }
   private final SwerveRequest.RobotCentric drive = new SwerveRequest.RobotCentric()
     .withDeadband(TunerConstants.kSpeedAt12VoltsMps * 0.01).withRotationalDeadband(Constants.Drive.MaxAngularRate * 0.01)

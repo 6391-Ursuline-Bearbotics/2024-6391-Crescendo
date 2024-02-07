@@ -12,19 +12,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.CommandSwerveDrivetrain;
 import frc.robot.Constants;
-import frc.robot.Vision.Limelight;
+import frc.robot.Vision.Detector;
 import frc.robot.generated.TunerConstants;
 
 /** Add your docs here. */
 public class DriveToGamePiece extends Command {
 
-  private Limelight ll;
+  private Detector ll;
   private CommandSwerveDrivetrain drivetrain;
   private PIDController thetaController = new PIDController(4.0, 0, 0.05);
-  public DriveToGamePiece(CommandSwerveDrivetrain drivetrain, Limelight Limelight) {
+  public DriveToGamePiece(CommandSwerveDrivetrain drivetrain, Detector ll) {
     addRequirements(drivetrain);
     this.drivetrain = drivetrain;
-    ll = Limelight;
+    this.ll = ll;
   }
   private final SwerveRequest.RobotCentric drive = new SwerveRequest.RobotCentric()
     .withDeadband(TunerConstants.kSpeedAt12VoltsMps * 0.01).withRotationalDeadband(Constants.Drive.MaxAngularRate * 0.01)
@@ -46,7 +46,7 @@ public class DriveToGamePiece extends Command {
   public void execute() {
 		if (ll.hasTarget()){
       setpoint = Math.toRadians(-ll.getNoteHorizontal())+ drivetrain.getState().Pose.getRotation().getRadians();
-      SmartDashboard.putNumber("Game Piece setpoint", setpoint)
+      SmartDashboard.putNumber("Game Piece setpoint", setpoint);
 			thetaController.setSetpoint(setpoint);
       if (!thetaController.atSetpoint() ){
 				thetaOutput = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);

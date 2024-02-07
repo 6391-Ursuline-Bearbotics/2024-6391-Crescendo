@@ -22,8 +22,7 @@ public class Limelight extends SubsystemBase {
   CommandSwerveDrivetrain drivetrain;
   Alliance alliance;
   private String ll = "limelight";
-  private Boolean enable = false;
-  private Boolean tagmode = true;
+  private Boolean enable = true;
   private Boolean trust = false;
   private int fieldError = 0;
   private int distanceError = 0;
@@ -35,11 +34,10 @@ public class Limelight extends SubsystemBase {
   private final DoubleArrayPublisher limelightPub = table.getDoubleArrayTopic("llPose").publish();
 
   /** Creates a new Limelight. */
-  public Limelight(CommandSwerveDrivetrain drivetrain, String ll, Boolean tagmode) {
+  public Limelight(CommandSwerveDrivetrain drivetrain, String ll) {
     this.drivetrain = drivetrain;
     this.ll = ll;
-    this.tagmode = tagmode;
-    LimelightHelpers.setPipelineIndex(ll, tagmode ? 0:1);
+    LimelightHelpers.setPipelineIndex(ll, 0);
     SmartDashboard.putNumber("Field Error", fieldError);
     SmartDashboard.putNumber("Limelight Error", distanceError);
   }
@@ -47,38 +45,36 @@ public class Limelight extends SubsystemBase {
   @Override
   public void periodic() {
     if (enable) {
-      if (tagmode) {
-        // Get the distance between the camera and the AprilTag, this will affect how much we trust the measurement
-        Double targetDistance = LimelightHelpers.getTargetPose3d_CameraSpace(ll).getTranslation().getDistance(new Translation3d());
-        // Tune this for your robot around how much variance you see in the pose at a given distance
-        Double confidence = 1 - ((targetDistance - 1) / 6);
-        LimelightHelpers.Results result =
-            LimelightHelpers.getLatestResults(ll).targetingResults;
-        if (result.valid) {
-          botpose = LimelightHelpers.getBotPose2d_wpiBlue(ll);
-          limelightPub.set(new double[] {
-            botpose.getX(),
-            botpose.getY(),
-            botpose.getRotation().getDegrees()
-          });
-          if (field.isPoseWithinArea(botpose)) {
-            if (drivetrain.getState().Pose.getTranslation().getDistance(botpose.getTranslation()) < 0.5
-                || trust
-                || result.targets_Fiducials.length > 1) {
-              drivetrain.addVisionMeasurement(
-                  botpose,
-                  Timer.getFPGATimestamp()
-                      - (result.latency_capture / 1000.0)
-                      - (result.latency_pipeline / 1000.0),
-                  VecBuilder.fill(confidence, confidence, .01));
-            } else {
-              distanceError++;
-              SmartDashboard.putNumber("Limelight Error", distanceError);
-            }
+      // Get the distance between the camera and the AprilTag, this will affect how much we trust the measurement
+      Double targetDistance = LimelightHelpers.getTargetPose3d_CameraSpace(ll).getTranslation().getDistance(new Translation3d());
+      // Tune this for your robot around how much variance you see in the pose at a given distance
+      Double confidence = 1 - ((targetDistance - 1) / 6);
+      LimelightHelpers.Results result =
+          LimelightHelpers.getLatestResults(ll).targetingResults;
+      if (result.valid) {
+        botpose = LimelightHelpers.getBotPose2d_wpiBlue(ll);
+        limelightPub.set(new double[] {
+          botpose.getX(),
+          botpose.getY(),
+          botpose.getRotation().getDegrees()
+        });
+        if (field.isPoseWithinArea(botpose)) {
+          if (drivetrain.getState().Pose.getTranslation().getDistance(botpose.getTranslation()) < 0.5
+              || trust
+              || result.targets_Fiducials.length > 1) {
+            drivetrain.addVisionMeasurement(
+                botpose,
+                Timer.getFPGATimestamp()
+                    - (result.latency_capture / 1000.0)
+                    - (result.latency_pipeline / 1000.0),
+                VecBuilder.fill(confidence, confidence, .01));
           } else {
-            fieldError++;
-            SmartDashboard.putNumber("Field Error", fieldError);
+            distanceError++;
+            SmartDashboard.putNumber("Limelight Error", distanceError);
           }
+        } else {
+          fieldError++;
+          SmartDashboard.putNumber("Field Error", fieldError);
         }
       }
     }
@@ -94,25 +90,5 @@ public class Limelight extends SubsystemBase {
 
   public void trustLL(boolean trust) {
     this.trust = trust;
-  }
-
-  public void switchToTags(boolean tagmode) {
-    this.tagmode = tagmode;
-    // Set LL Pipeline to 0 if tag 1 if ML
-    LimelightHelpers.setPipelineIndex(ll, tagmode ? 0:1);
-  }
-
-  public boolean hasTarget() {
-    if (!tagmode) {
-      return LimelightHelpers.getTV(ll);
-    }
-    return false;
-  }
-
-  public double getNoteHorizontal() {
-    if (!tagmode) {
-      return LimelightHelpers.getTX(ll);
-    }
-    return 0;
   }
 }
