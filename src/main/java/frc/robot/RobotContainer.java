@@ -16,6 +16,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -90,6 +91,10 @@ public class RobotContainer {
   private String lastControl = "2 Joysticks";
   private Double lastSpeed = 0.65;
 
+  private PIDController thetaController = new PIDController(4.0, 0, 0.05);
+  private Translation2d speaker;
+  private Double thetaOutput;
+
   private void configureBindings() {
     newControlStyle();
     newSpeed();
@@ -109,6 +114,8 @@ public class RobotContainer {
       robo.botSourceRobotic,
       () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly());
 
+    drv.a().whileTrue(drivetrain.run(() -> autoAim()));
+    
     Trigger noteFound = new Trigger(() -> intakeCamera.hasTarget());
     noteFound.onTrue(runOnce(() -> lights.setAll(Color.kGreen)));
     noteFound.onFalse(runOnce(() -> lights.setAll(Color.kBlue)));
@@ -302,5 +309,22 @@ public class RobotContainer {
         pickupTrigger.onTrue(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true)));
       }
     }
+  }
+
+  private void autoAim() {
+    var alliance = DriverStation.getAlliance();
+    if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+      speaker = Constants.Field.redSpeaker;
+    } else {
+      speaker = Constants.Field.blueSpeaker;
+    }
+    double setpoint = speaker.minus(drivetrain.getState().Pose.getTranslation()).getAngle().getRadians();
+    SmartDashboard.putNumber("Auto Aim Setpoint", setpoint);
+    double temp = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);
+    if (!thetaController.atSetpoint() ){
+      thetaOutput = temp;
+      SmartDashboard.putNumber("Auto Aim", thetaOutput);
+    }
+    drivetrain.setControl(drive.withVelocityX(-drv.getLeftY() * MaxSpeed).withVelocityY(-drv.getLeftX() * MaxSpeed).withRotationalRate(thetaOutput));
   }
 }

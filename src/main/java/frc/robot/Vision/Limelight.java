@@ -4,6 +4,8 @@
 
 package frc.robot.Vision;
 
+import com.ctre.phoenix6.Utils;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -12,6 +14,7 @@ import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -44,7 +47,7 @@ public class Limelight extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (enable) {
+    if (enable && !RobotBase.isSimulation()) {
       // Get the distance between the camera and the AprilTag, this will affect how much we trust the measurement
       Double targetDistance = LimelightHelpers.getTargetPose3d_CameraSpace(ll).getTranslation().getDistance(new Translation3d());
       // Tune this for your robot around how much variance you see in the pose at a given distance
