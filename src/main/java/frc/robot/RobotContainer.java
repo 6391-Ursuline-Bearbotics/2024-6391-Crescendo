@@ -99,32 +99,44 @@ public class RobotContainer {
     newControlStyle();
     newSpeed();
 
-    drv.x().whileTrue(either(
+    // Set up Driver Controls ================================================
+    // Does full automation while held on the Amp side of the field
+    drv.x().whileTrue(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
       either(robo.topRobotic, robo.TopAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
       robo.topSourceRobotic,
-      () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly());
+      () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly()));
+    drv.x().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
-    drv.y().whileTrue(either(
+    // Does full automation while held though the middle of the field
+    drv.y().whileTrue(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
       either(robo.midRobotic, robo.MidAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
       robo.midSourceRobotic,
-      () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly());
+      () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly()));
+    drv.y().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
-    drv.b().whileTrue(either(
+    // Does full automation while held on the Source side of the field
+    drv.b().whileTrue(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
       either(robo.botRobotic, robo.BotAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
       robo.botSourceRobotic,
-      () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly());
+      () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly()));
+    drv.b().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
+    // While held will stay aimed at the speaker driver still has translation control but not rotation
     drv.a().whileTrue(drivetrain.run(() -> autoAim()));
-    
-    Trigger noteFound = new Trigger(() -> intakeCamera.hasTarget());
-    noteFound.onTrue(runOnce(() -> lights.setAll(Color.kGreen)));
-    noteFound.onFalse(runOnce(() -> lights.setAll(Color.kBlue)));
 
-    drv.povUp().whileTrue(new DriveToGamePiece(drivetrain, intakeCamera));
-    drv.povDown().whileTrue(new StrafeToGamePiece(drivetrain, intakeCamera));
+    // Until we have a real robot / sensor this will simulate loading a note
+    drv.povUp().onTrue(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true)));
+    drv.povDown().onTrue(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", false)));
+
+    // Temporary should be handled by the operator
+    drv.povRight().onTrue(runOnce(() -> SmartDashboard.putBoolean("speaker", true)));
+    drv.povLeft().onTrue(runOnce(() -> SmartDashboard.putBoolean("speaker", false)));
     
     // reset the field-centric heading on start button press
     drv.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+
+    // Drives to the game piece using turn, it will not strafe
+    drv.back().whileTrue(new DriveToGamePiece(drivetrain, intakeCamera));
 
     // Turtle Mode while held
     drv.leftBumper().onTrue(runOnce(() -> MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * TurtleSpeed)
@@ -132,14 +144,35 @@ public class RobotContainer {
     drv.leftBumper().onFalse(runOnce(() -> MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * speedChooser.getSelected())
         .andThen(() -> AngularRate = MaxAngularRate));
 
-    // Temporary should be handled by the operator
-    drv.povRight().onTrue(runOnce(() -> SmartDashboard.putBoolean("speaker", true)));
-    drv.povLeft().onTrue(runOnce(() -> SmartDashboard.putBoolean("speaker", false)));
-
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
     }
     drivetrain.registerTelemetry(logger::telemeterize);
+
+    // Set up for the operator controls =========================================
+    // Run the intake pushing the disk into the shooter for either the speaker or amp
+    op.x().onTrue(intake.shoot());
+
+    // Get ready to score in the Amp
+    op.y().onTrue(arm.setAmpPosition()
+        .alongWith(shooter.setAmpSpeed())
+        .alongWith(intake.intakeOff()));
+
+    // Get ready to score in the Speaker
+    op.b().onTrue(arm.setShootPosition()
+        .alongWith(shooter.setAutoSpeed())
+        .alongWith(intake.intakeOff()));
+
+    // Get ready to intake the note
+    op.a().onTrue(arm.setIntakePosition()
+        .alongWith(shooter.setOffSpeed())
+        .alongWith(intake.intakeOn()));
+
+    // TRIGGERS==================================================================
+    // When a note is detected by the camera near the intake turn the lights green
+    Trigger noteTrigger = new Trigger(() -> intakeCamera.hasTarget());
+    noteTrigger.onTrue(runOnce(() -> SmartDashboard.putBoolean("noteFound", true)));
+    noteTrigger.onFalse(runOnce(() -> SmartDashboard.putBoolean("noteFound", false)));
 
     Trigger controlPick = new Trigger(() -> lastControl != controlChooser.getSelected());
     controlPick.onTrue(runOnce(() -> newControlStyle()));
@@ -148,11 +181,13 @@ public class RobotContainer {
     speedPick.onTrue(runOnce(() -> newSpeed()));
 
     // Turn the intake off whenever the note gets to the sensor
-    intake.getIntakeSensor().onTrue(intake.intakeOff().alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true))));
+    intake.getIntakeSensor().onTrue(intake.intakeOff()
+        .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true))));
     intake.getIntakeSensor().onFalse(
         new WaitCommand(0.2).andThen(shooter.setOffSpeed())
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", false))));
 
+    // All of these bindings are for System Indentification and will be disabled at competition
     drv.x().and(drv.pov(0)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kForward));
     drv.x().and(drv.pov(180)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kReverse));
 
@@ -326,5 +361,29 @@ public class RobotContainer {
       SmartDashboard.putNumber("Auto Aim", thetaOutput);
     }
     drivetrain.setControl(drive.withVelocityX(-drv.getLeftY() * MaxSpeed).withVelocityY(-drv.getLeftX() * MaxSpeed).withRotationalRate(thetaOutput));
+  }
+
+  public void setLEDs() {
+    if (DriverStation.isDisabled()) {
+      lights.rainbow();
+    } else {
+      if (SmartDashboard.getBoolean("autoControlled", false)) {
+        lights.setAllBlink(Color.kPurple, 1.0);
+      } else {
+        if (SmartDashboard.getBoolean("noteLoaded", false)) {
+          if (SmartDashboard.getBoolean("readyToShoot", false)) {
+            lights.setAll(Color.kGreen);
+          } else {
+            lights.setAll(Color.kRed);
+          }
+        } else {
+          if (SmartDashboard.getBoolean("noteFound", false)) {
+            lights.setAllBlink(Color.kGreen, 1.0);
+          } else {
+            lights.setAll(Color.kBlue);
+          }
+        }
+      }
+    }
   }
 }

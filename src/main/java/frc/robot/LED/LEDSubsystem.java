@@ -2,6 +2,7 @@ package frc.robot.LED;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -11,11 +12,13 @@ public class LEDSubsystem extends SubsystemBase {
   private final AddressableLED m_led = new AddressableLED(PWMPORT);
   private final AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(LEDLENGTH);
   private int m_rainbowFirstPixelHue;
+  private final Timer blink = new Timer();
 
   public LEDSubsystem() {
     m_led.setLength(m_ledBuffer.getLength());
     m_led.setData(m_ledBuffer);
     m_led.start();
+    blink.start();
   }
 
   @Override
@@ -64,5 +67,18 @@ public class LEDSubsystem extends SubsystemBase {
       m_ledBuffer.setLED(i, color);
     }
     m_led.setData(m_ledBuffer);
+  }
+
+  public void setAllBlink(Color color, Double sec) {
+    if(blink.hasElapsed(sec)) {
+      if (m_ledBuffer.getLED(0) != Color.kBlack) {
+        color = Color.kBlack;
+      }
+      for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+        m_ledBuffer.setLED(i, color);
+      }
+      m_led.setData(m_ledBuffer);
+      blink.reset();
+    }
   }
 }
