@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -153,7 +154,10 @@ public class RobotContainer {
     // Run the intake pushing the disk into the shooter for either the speaker or amp
     op.x().onTrue(intake.shoot());
 
-    // Get ready to score in the Amp
+    // This is the backup manual control of the Arm
+    arm.setDefaultCommand(Commands.run(() -> arm.setArmPower(-op.getRightY() * 0.25), arm));
+
+/*     // Get ready to score in the Amp
     op.y().onTrue(arm.setAmpPosition()
         .alongWith(shooter.setAmpSpeed())
         .alongWith(intake.intakeOff()));
@@ -166,7 +170,7 @@ public class RobotContainer {
     // Get ready to intake the note
     op.a().onTrue(arm.setIntakePosition()
         .alongWith(shooter.setOffSpeed())
-        .alongWith(intake.intakeOn()));
+        .alongWith(intake.intakeOn())); */
 
     // TRIGGERS==================================================================
     // When a note is detected by the camera near the intake turn the lights green
@@ -213,9 +217,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("shooterAmpSpeed", shooter.setAmpSpeed());
     NamedCommands.registerCommand("shooterOffSpeed", shooter.setOffSpeed());
     NamedCommands.registerCommand("shoot", intake.shoot());
-    NamedCommands.registerCommand("armIntakePosition", arm.setIntakePosition());
-    NamedCommands.registerCommand("armShootPosition", arm.setShootPosition());
-    NamedCommands.registerCommand("armAmpPosition", arm.setAmpPosition());
+    //NamedCommands.registerCommand("armIntakePosition", arm.setIntakePosition());
+    //NamedCommands.registerCommand("armShootPosition", arm.setShootPosition());
+    //NamedCommands.registerCommand("armAmpPosition", arm.setAmpPosition());
     NamedCommands.registerCommand("intakeOn", intake.intakeOn());
     NamedCommands.registerCommand("intakeOff", intake.intakeOff());
 
@@ -306,11 +310,11 @@ public class RobotContainer {
     return xLimiter.calculate(MathUtil.applyDeadband(joystick, deadband));
   }
 
-  private Command distanceShot(double distance) {
+/*   private Command distanceShot(double distance) {
     ShotParameter shot = InterpolatingTable.get(distance);
     return shooter.runOnce(() -> shooter.setRPS(shot.rpm / 60.0))
       .alongWith(arm.runOnce(() -> arm.setGoal(shot.angle)));
-  }
+  } */
 
   public void colorReceived(Alliance ally) {
     if (Utils.isSimulation()) {

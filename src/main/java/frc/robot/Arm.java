@@ -4,93 +4,101 @@
 
 package frc.robot;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkAbsoluteEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
+public class Arm extends SubsystemBase {
+  WPI_TalonFX armMotor;
+  TalonFXConfiguration config = new TalonFXConfiguration();
+  /** How many amps the arm motor can use. */
+  static final int ARM_CURRENT_LIMIT_A = 20;
 
-public class Arm extends TrapezoidProfileSubsystem {
-  private static final int armPrimaryID = 1;
-  private static final int armFollowerID = 2;
-  private CANSparkMax m_motor;
-  private CANSparkMax m_follower;
-  private SparkPIDController m_pidController;
-  private SparkAbsoluteEncoder m_absoluteEncoder;
-  private ArmFeedforward m_armFF;
+  /** Percent output to run the arm up/down at */
+  static final double ARM_OUTPUT_POWER = 0.5;
 
-  // Arm setpoints in  rotations
-  private static final double intakePosition = 0.0;
-  private static final double shootPosition = 0.0;
-  private static final double ampPosition = 0.0;
+  /** Time to extend or retract arm in auto */
+  static final double ARM_EXTEND_TIME_S = 2.0;
 
-  // Arm Contraints
-  private static final double kMaxVelocityRadPerSecond = 0.0;
-  private static final double kMaxAccelerationRadPerSecSquared = 0.0;
-  private static final double kArmOffsetRads = 0.0;
+  /** Stow position in Falcon units */
+  static final double STOW = 0.0;
+
+  /** High position in Falcon units */
+  static final double HIGH = 68000.0;
+
+  /** Middle position in Falcon units */
+  static final double MID = 34000.0;
+
+  /** Low position in Falcon units */
+  static final double LOW = 18594.0;
+
+  /** Proportional term of PID for arm position control */
+  static final double kP = 0.1;
+
+  /** Threshold to determine how close we need to be to our position target in encoder ticks */
+  static final double ERROR_THRESHOLD = 100;
 
   /** Creates a new Arm. */
   public Arm() {
-    super(
-      new TrapezoidProfile.Constraints(
-          kMaxVelocityRadPerSecond, kMaxAccelerationRadPerSecSquared),
-      kArmOffsetRads);
-
-    // initialize motor
-    m_motor = new CANSparkMax(armPrimaryID, MotorType.kBrushless);
-    m_follower = new CANSparkMax(armFollowerID, MotorType.kBrushless);
-    m_motor.restoreFactoryDefaults();
-    m_follower.restoreFactoryDefaults();
-    m_motor.setInverted(false);
-    m_follower.setInverted(true);
-    m_motor.setIdleMode(IdleMode.kBrake);
-    m_follower.setIdleMode(IdleMode.kBrake);
-    m_follower.follow(m_motor);
-
-    m_absoluteEncoder = m_motor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-
-    m_pidController = m_motor.getPIDController();
-    m_pidController.setP(0.1);
-    m_pidController.setI(0);
-    m_pidController.setD(0);
-    m_pidController.setIZone(0);
-    m_pidController.setFF(0);
-    m_pidController.setOutputRange(-0.25, 0.25);
-    m_pidController.setFeedbackDevice(m_absoluteEncoder);
-
-    m_motor.burnFlash();
-
-    m_armFF = new ArmFeedforward(0, 0.1, 0);
+    armMotor = new WPI_TalonFX(8);
+    armMotor.configFactoryDefault();
+    armMotor.setInverted(false);
+    armMotor.setNeutralMode(NeutralMode.Brake);
+    armMotor.configVoltageCompSaturation(12.0);
+    armMotor.enableVoltageCompensation(true);
+    config.statorCurrLimit =
+        new StatorCurrentLimitConfiguration(
+            true, ARM_CURRENT_LIMIT_A, ARM_CURRENT_LIMIT_A + 10, .1);
+    config.slot0.kP = kP;
+    config.closedloopRamp = 0.25;
+    config.openloopRamp = 0.25;
+    config.peakOutputForward = ARM_OUTPUT_POWER;
+    config.peakOutputReverse = -ARM_OUTPUT_POWER;
+    armMotor.configAllSettings(config);
   }
 
   @Override
-  public void useState(TrapezoidProfile.State setpoint) {
-    // Calculate the feedforward from the sepoint
-    double feedforward = m_armFF.calculate(setpoint.position, setpoint.velocity);
-    // Add the feedforward to the PID output to get the motor output
-    m_pidController.setReference(setpoint.position, ControlType.kPosition, 0, feedforward / 12.0);
+  public void periodic() {}
+
+  public void stowArm() {
+    setArmPosition(STOW);
   }
 
-  public Command setIntakePosition() {
-    return setArmGoalCommand(intakePosition);
+  public void extendArmHigh() {
+    setArmPosition(HIGH);
   }
 
-  public Command setShootPosition() {
-    return setArmGoalCommand(shootPosition);
+  public void extendArmMid() {
+    setArmPosition(MID);
   }
 
-  public Command setAmpPosition() {
-    return setArmGoalCommand(ampPosition);
+  public void extendArmLow() {
+    setArmPosition(LOW);
   }
 
-  public Command setArmGoalCommand(double kArmOffsetRads) {
-    return Commands.runOnce(() -> setGoal(kArmOffsetRads), this);
+  public void stopArm() {
+    armMotor.set(0);
+  }
+
+  public void setArmPower(double percent) {
+    armMotor.set(percent);
+  }
+
+  private void setArmPosition(double position) {
+    armMotor.set(TalonFXControlMode.Position, position);
+  }
+
+  public void zeroArm() {
+    armMotor.setSelectedSensorPosition(0);
+  }
+
+  public double getArmPosition() {
+    var pos = armMotor.getSelectedSensorPosition();
+    SmartDashboard.putNumber("Arm Position", pos);
+    return pos;
   }
 }
