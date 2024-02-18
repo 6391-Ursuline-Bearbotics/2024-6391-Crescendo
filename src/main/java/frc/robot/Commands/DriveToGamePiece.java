@@ -30,8 +30,9 @@ public class DriveToGamePiece extends Command {
     .withDeadband(TunerConstants.kSpeedAt12VoltsMps * 0.01).withRotationalDeadband(Constants.Drive.MaxAngularRate * 0.01)
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
   private double thetaOutput = 0;
-  private final double xOutput = 0.2; // Speed to drive towards note will increase after testing
-  private final double yOutput = 0;
+  private final double forwardPower = 0.2;
+  private double xOutput = 0.0; // Speed to drive towards note will increase after testing
+  private double yOutput = 0.0;
   private double setpoint = 0; // How far the camera is offset from the center in degrees
 
   // Called when the command is initially scheduled.
@@ -45,7 +46,9 @@ public class DriveToGamePiece extends Command {
   @Override
   public void execute() {
 		if (ll.hasTarget()){
-      setpoint = Math.toRadians(-ll.getNoteHorizontal())+ drivetrain.getState().Pose.getRotation().getRadians();
+      setpoint = Math.toRadians(-ll.getNoteHorizontal() + 16)+ drivetrain.getState().Pose.getRotation().getRadians();
+      yOutput = Math.cos(setpoint) * forwardPower;
+      xOutput = Math.sin(setpoint) * forwardPower;
       SmartDashboard.putNumber("Game Piece setpoint", setpoint);
 			thetaController.setSetpoint(setpoint);
       if (!thetaController.atSetpoint() ){
@@ -54,7 +57,7 @@ public class DriveToGamePiece extends Command {
 			}
 		}
     
-    drivetrain.setControl(drive.withVelocityX(-xOutput * TunerConstants.kSpeedAt12VoltsMps).withVelocityY(yOutput).withRotationalRate(thetaOutput));
+    drivetrain.setControl(drive.withVelocityX(-xOutput * TunerConstants.kSpeedAt12VoltsMps).withVelocityY(-yOutput * TunerConstants.kSpeedAt12VoltsMps).withRotationalRate(thetaOutput));
   }
 
   // Called once the command ends or is interrupted.

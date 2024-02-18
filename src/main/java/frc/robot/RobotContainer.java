@@ -131,6 +131,8 @@ public class RobotContainer {
     // Temporary should be handled by the operator
     drv.povRight().onTrue(runOnce(() -> SmartDashboard.putBoolean("speaker", true)));
     drv.povLeft().onTrue(runOnce(() -> SmartDashboard.putBoolean("speaker", false)));
+
+    drv.leftTrigger().onTrue(runOnce(() -> intakeCamera.setPipeline()));
     
     // reset the field-centric heading on start button press
     drv.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
