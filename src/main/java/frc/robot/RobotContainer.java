@@ -60,7 +60,7 @@ public class RobotContainer {
 
   // Slew Rate Limiters to limit acceleration of joystick inputs
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(2);
-  private final SlewRateLimiter yLimiter = new SlewRateLimiter(0.5);
+  private final SlewRateLimiter yLimiter = new SlewRateLimiter(2);
   private final SlewRateLimiter rotLimiter = new SlewRateLimiter(0.5);
 
   // Starting the other subsystems
@@ -75,8 +75,8 @@ public class RobotContainer {
   // For closed loop replace DriveRequestType.OpenLoopVoltage with DriveRequestType.Velocity
   SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
-      .withDeadband(MaxSpeed * 0.1) // Deadband is handled on input
-      .withRotationalDeadband(AngularRate * 0.1);
+      .withDeadband(0) // Deadband is handled on input
+      .withRotationalDeadband(0);
 
   SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
@@ -91,7 +91,7 @@ public class RobotContainer {
   private String lastControl = "2 Joysticks";
   private Double lastSpeed = 0.65;
 
-  private PIDController thetaController = new PIDController(4.0, 0, 0.05);
+  private PIDController thetaController = new PIDController(5.0, 0, 0.05);
   private Translation2d speaker;
   private Double thetaOutput;
 
@@ -263,8 +263,8 @@ public class RobotContainer {
     lastControl = controlChooser.getSelected();
     switch (controlChooser.getSelected()) {
       case "2 Joysticks":
-        controlStyle = () -> drive.withVelocityX(-drv.getLeftY() * MaxSpeed) // Drive forward -Y
-            .withVelocityY(-drv.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+        controlStyle = () -> drive.withVelocityX(conditionX(-drv.getLeftY()) * MaxSpeed) // Drive forward -Y
+            .withVelocityY(conditionY(-drv.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
             .withRotationalRate(-drv.getRightX() * AngularRate); // Drive counterclockwise with negative X (left)
         break;
       case "1 Joystick Rotation Triggers":
@@ -302,8 +302,12 @@ public class RobotContainer {
     MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * lastSpeed;
   }
 
-  private double conditionX(double joystick, double deadband) {
-    return xLimiter.calculate(MathUtil.applyDeadband(joystick, deadband));
+  private double conditionX(double joystick) {
+    return xLimiter.calculate(MathUtil.applyDeadband(joystick, MaxSpeed * 0.1));
+  }
+
+  private double conditionY(double joystick) {
+    return yLimiter.calculate(MathUtil.applyDeadband(joystick, MaxSpeed * 0.1));
   }
 
   private Command distanceShot(double distance) {
@@ -353,7 +357,7 @@ public class RobotContainer {
     } else {
       speaker = Constants.Field.blueSpeaker;
     }
-    double setpoint = speaker.minus(drivetrain.getState().Pose.getTranslation()).getAngle().getRadians();
+    double setpoint = speaker.minus(drivetrain.getState().Pose.getTranslation()).getAngle().plus(new Rotation2d(Math.PI)).getRadians();
     SmartDashboard.putNumber("Auto Aim Setpoint", setpoint);
     double temp = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);
     if (!thetaController.atSetpoint() ){

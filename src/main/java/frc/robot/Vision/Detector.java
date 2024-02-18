@@ -4,6 +4,7 @@ public class Detector {
   private String ll;
   public Detector (String ll) {
     this.ll = ll;
+    LimelightHelpers.setPipelineIndex(ll, 1);
   }
 
   public boolean hasTarget() {
