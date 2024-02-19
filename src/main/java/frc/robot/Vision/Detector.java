@@ -13,4 +13,8 @@ public class Detector {
   public double getNoteHorizontal() {
     return LimelightHelpers.getTX(ll);
   }
+
+  public void setPipeline(Integer pipeline) {
+    LimelightHelpers.setPipelineIndex(ll, pipeline);
+  }
 }

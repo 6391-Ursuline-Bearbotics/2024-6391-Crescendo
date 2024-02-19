@@ -46,8 +46,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     SmartDashboard.putString("AutoAlliance", DriverStation.getAlliance().toString());
-    // Sets the driver perspective to forward for Red Side
-    m_robotContainer.drivetrain.setOperatorPerspectiveForward(Rotation2d.fromDegrees(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? 0 : 180));
+
+    m_robotContainer.intakeCamera.setPipeline(1);
 
     // Allows the simulation sensor to work on the proper side of the field
     m_robotContainer.colorReceived(DriverStation.getAlliance().orElse(Alliance.Blue));
@@ -68,6 +68,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     SmartDashboard.putString("TeleopAlliance", DriverStation.getAlliance().toString());
+
+    m_robotContainer.intakeCamera.setPipeline(1);
+
     // Sets the driver perspective to forward for Red Side
     m_robotContainer.drivetrain.setOperatorPerspectiveForward(Rotation2d.fromDegrees(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? 0 : 180));
 

@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.DriveToGamePiece;
-import frc.robot.Commands.StrafeToGamePiece;
 import frc.robot.LED.LEDSubsystem;
 import frc.robot.Util.CommandXboxPS5Controller;
 import frc.robot.Util.InterpolatingTable;
@@ -56,16 +55,18 @@ public class RobotContainer {
   CommandXboxPS5Controller drv = new CommandXboxPS5Controller(0); // driver xbox controller
   CommandXboxPS5Controller op = new CommandXboxPS5Controller(1); // operator xbox controller
   CommandSwerveDrivetrain drivetrain;
-  RoboticPathing robo;  
+  RoboticPathing robo;
+  Command topRoboticRoutine;
+  Command botRoboticRoutine;
 
   // Slew Rate Limiters to limit acceleration of joystick inputs
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(2);
-  private final SlewRateLimiter yLimiter = new SlewRateLimiter(0.5);
+  private final SlewRateLimiter yLimiter = new SlewRateLimiter(2);
   private final SlewRateLimiter rotLimiter = new SlewRateLimiter(0.5);
 
   // Starting the other subsystems
   private final LEDSubsystem lights = new LEDSubsystem();
-  private final Detector intakeCamera = new Detector("limelight-note");
+  public final Detector intakeCamera = new Detector("limelight-note");
   private final Limelight shooterCamera;
   private final Arm arm = new Arm();
   private final Shooter shooter = new Shooter();
@@ -75,12 +76,10 @@ public class RobotContainer {
   // For closed loop replace DriveRequestType.OpenLoopVoltage with DriveRequestType.Velocity
   SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
-      .withDeadband(MaxSpeed * 0.1) // Deadband is handled on input
-      .withRotationalDeadband(AngularRate * 0.1);
+      .withDeadband(0) // Deadband is handled on input
+      .withRotationalDeadband(0);
 
   SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-  SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -94,6 +93,7 @@ public class RobotContainer {
   private PIDController thetaController = new PIDController(4.0, 0, 0.05);
   private Translation2d speaker;
   private Double thetaOutput;
+  private boolean blue = false;
 
   private void configureBindings() {
     newControlStyle();
@@ -101,10 +101,7 @@ public class RobotContainer {
 
     // Set up Driver Controls ================================================
     // Does full automation while held on the Amp side of the field
-    drv.x().whileTrue(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
-      either(robo.topRobotic, robo.TopAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
-      robo.topSourceRobotic,
-      () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly()));
+    drv.x().whileTrue(getChoice(true, blue));
     drv.x().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // Does full automation while held though the middle of the field
@@ -115,10 +112,7 @@ public class RobotContainer {
     drv.y().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // Does full automation while held on the Source side of the field
-    drv.b().whileTrue(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
-      either(robo.botRobotic, robo.BotAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
-      robo.botSourceRobotic,
-      () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly()));
+    drv.b().whileTrue(getChoice(false, blue));
     drv.b().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // While held will stay aimed at the speaker driver still has translation control but not rotation
@@ -223,6 +217,17 @@ public class RobotContainer {
     robo = new RoboticPathing();
     shooterCamera = new Limelight(drivetrain, "limelight");
 
+    // Creating the routine commands here for top/bot so we can switch them depending on Alliance
+    topRoboticRoutine = runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
+        either(robo.topRobotic, robo.TopAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
+        robo.topSourceRobotic,
+        () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly());
+
+    botRoboticRoutine = runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
+        either(robo.botRobotic, robo.BotAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
+        robo.botSourceRobotic,
+        () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly());
+
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -263,9 +268,9 @@ public class RobotContainer {
     lastControl = controlChooser.getSelected();
     switch (controlChooser.getSelected()) {
       case "2 Joysticks":
-        controlStyle = () -> drive.withVelocityX(-drv.getLeftY() * MaxSpeed) // Drive forward -Y
-            .withVelocityY(-drv.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-            .withRotationalRate(-drv.getRightX() * AngularRate); // Drive counterclockwise with negative X (left)
+        controlStyle = () -> drive.withVelocityX(conditionX(-drv.getLeftY()) * MaxSpeed) // Drive forward -Y
+            .withVelocityY(conditionY(-drv.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
+            .withRotationalRate(conditionRot(-drv.getRightX()) * AngularRate); // Drive counterclockwise with negative X (left)
         break;
       case "1 Joystick Rotation Triggers":
         controlStyle = () -> drive.withVelocityX(-drv.getLeftY() * MaxSpeed) // Drive forward -Y
@@ -302,8 +307,16 @@ public class RobotContainer {
     MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * lastSpeed;
   }
 
-  private double conditionX(double joystick, double deadband) {
-    return xLimiter.calculate(MathUtil.applyDeadband(joystick, deadband));
+  private double conditionX(double joystick) {
+    return xLimiter.calculate(MathUtil.applyDeadband(joystick, 0.05));
+  }
+
+  private double conditionY(double joystick) {
+    return yLimiter.calculate(MathUtil.applyDeadband(joystick, 0.05));
+  }
+
+  private double conditionRot(double joystick) {
+    return rotLimiter.calculate(MathUtil.applyDeadband(joystick, 0.05));
   }
 
   private Command distanceShot(double distance) {
@@ -313,6 +326,11 @@ public class RobotContainer {
   }
 
   public void colorReceived(Alliance ally) {
+    if (ally == Alliance.Blue) {
+      blue = true;
+    } else {
+      blue = false;
+    }
     if (Utils.isSimulation()) {
       if (ally == Alliance.Blue) {
         // In sim when we go near the spearker / amp trigger a note release
@@ -384,6 +402,15 @@ public class RobotContainer {
           }
         }
       }
+    }
+  }
+
+  private Command getChoice(Boolean xButton, Boolean blueAlly) {
+    // Run top if blue left button(x) or red right button(b)
+    if ((blueAlly && xButton) || (!blueAlly && !xButton)) {
+      return topRoboticRoutine;
+    } else {
+      return botRoboticRoutine;
     }
   }
 }

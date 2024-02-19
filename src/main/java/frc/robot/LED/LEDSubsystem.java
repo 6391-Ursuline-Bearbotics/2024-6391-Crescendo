@@ -13,6 +13,7 @@ public class LEDSubsystem extends SubsystemBase {
   private final AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(LEDLENGTH);
   private int m_rainbowFirstPixelHue;
   private final Timer blink = new Timer();
+  private Color lastColor = Color.kBlack;
 
   public LEDSubsystem() {
     m_led.setLength(m_ledBuffer.getLength());
@@ -71,8 +72,11 @@ public class LEDSubsystem extends SubsystemBase {
 
   public void setAllBlink(Color color, Double sec) {
     if(blink.hasElapsed(sec)) {
-      if (m_ledBuffer.getLED(0) != Color.kBlack) {
+      if (lastColor != Color.kBlack) {
         color = Color.kBlack;
+        lastColor = Color.kBlack;
+      } else {
+        lastColor = color;
       }
       for (var i = 0; i < m_ledBuffer.getLength(); i++) {
         m_ledBuffer.setLED(i, color);
