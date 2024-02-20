@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.wpilibj2.command.Commands.either;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.Utils;
@@ -16,7 +17,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -80,6 +80,9 @@ public class RobotContainer {
       .withDeadband(0) // Deadband is handled on input
       .withRotationalDeadband(0);
 
+  SwerveRequest.FieldCentricFacingAngle autoAim = new SwerveRequest.FieldCentricFacingAngle()
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
   SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
   Telemetry logger = new Telemetry(MaxSpeed);
@@ -91,9 +94,7 @@ public class RobotContainer {
   private String lastControl = "2 Joysticks";
   private Double lastSpeed = 0.65;
 
-  private PIDController thetaController = new PIDController(4.0, 0, 0.05);
   private Translation2d speaker;
-  private Double thetaOutput;
   private boolean blue = false;
 
   private void configureBindings() {
@@ -182,6 +183,13 @@ public class RobotContainer {
         new WaitCommand(0.2).andThen(shooter.setOffSpeed())
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", false))));
 
+    // If all conditions met light LED green (may later auto shoot)
+    Trigger readyToShoot = new Trigger(
+        () -> shooter.atSetpoint()).and(
+        () -> SmartDashboard.getBoolean("noteLoaded", false));
+    readyToShoot.onTrue(runOnce(() -> SmartDashboard.putBoolean("readyToShoot", true)));
+    readyToShoot.onFalse(runOnce(() -> SmartDashboard.putBoolean("readyToShoot", false)));
+
     // All of these bindings are for System Indentification and will be disabled at competition
     drv.x().and(drv.pov(0)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kForward));
     drv.x().and(drv.pov(180)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kReverse));
@@ -218,7 +226,9 @@ public class RobotContainer {
     robo = new RoboticPathing();
     shooterCamera = new Limelight(drivetrain, "limelight");
 
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    autoAim.HeadingController.setPID(4.0, 0.0, 0.5);
+
+    //PPHolonomicDriveController.setRotationTargetOverride(Optional.of(getSpeakerRotation()));
 
     // Creating the routine commands here for top/bot so we can switch them depending on Alliance
     topRoboticRoutine = runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
@@ -367,7 +377,7 @@ public class RobotContainer {
     }
   }
 
-  private void autoAim() {
+  private Rotation2d getSpeakerRotation() {
     var alliance = DriverStation.getAlliance();
     if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
       speaker = Constants.Field.redSpeaker;
@@ -378,12 +388,11 @@ public class RobotContainer {
     Rotation2d setpoint = speaker.minus(drivetrain.getState().Pose.getTranslation()).getAngle();
     SmartDashboard.putNumber("Auto Aim Robot", currentAngle.getRadians());
     SmartDashboard.putNumber("Auto Aim Setpoint", setpoint.getRadians());
-    double temp = thetaController.calculate(currentAngle.getRadians(), setpoint.getRadians());
-    if (!thetaController.atSetpoint()){
-      thetaOutput = temp;
-      SmartDashboard.putNumber("Auto Aim %", thetaOutput);
-    }
-    drivetrain.setControl(drive.withVelocityX(-drv.getLeftY() * MaxSpeed).withVelocityY(-drv.getLeftX() * MaxSpeed).withRotationalRate(thetaOutput * AngularRate));
+    return setpoint;
+  }
+
+  private void autoAim() {
+    drivetrain.setControl(autoAim.withVelocityX(-drv.getLeftY() * MaxSpeed).withVelocityY(-drv.getLeftX() * MaxSpeed).withTargetDirection(getSpeakerRotation()));
   }
 
   public Translation2d getMovingSpeaker(boolean blue) {
