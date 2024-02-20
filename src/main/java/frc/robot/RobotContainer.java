@@ -21,6 +21,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -217,6 +218,8 @@ public class RobotContainer {
     robo = new RoboticPathing();
     shooterCamera = new Limelight(drivetrain, "limelight");
 
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
     // Creating the routine commands here for top/bot so we can switch them depending on Alliance
     topRoboticRoutine = runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
         either(robo.topRobotic, robo.TopAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
@@ -369,16 +372,27 @@ public class RobotContainer {
     if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
       speaker = Constants.Field.redSpeaker;
     } else {
-      speaker = Constants.Field.blueSpeaker;
+      speaker = Constants.Field.blueSpeaker; //getMovingSpeaker(true);
     }
-    double setpoint = speaker.minus(drivetrain.getState().Pose.getTranslation()).getAngle().getRadians();
-    SmartDashboard.putNumber("Auto Aim Setpoint", setpoint);
-    double temp = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);
-    if (!thetaController.atSetpoint() ){
+    Rotation2d currentAngle = drivetrain.getState().Pose.getRotation().plus(new Rotation2d(Math.PI));
+    Rotation2d setpoint = speaker.minus(drivetrain.getState().Pose.getTranslation()).getAngle();
+    SmartDashboard.putNumber("Auto Aim Robot", currentAngle.getRadians());
+    SmartDashboard.putNumber("Auto Aim Setpoint", setpoint.getRadians());
+    double temp = thetaController.calculate(currentAngle.getRadians(), setpoint.getRadians());
+    if (!thetaController.atSetpoint()){
       thetaOutput = temp;
-      SmartDashboard.putNumber("Auto Aim", thetaOutput);
+      SmartDashboard.putNumber("Auto Aim %", thetaOutput);
     }
-    drivetrain.setControl(drive.withVelocityX(-drv.getLeftY() * MaxSpeed).withVelocityY(-drv.getLeftX() * MaxSpeed).withRotationalRate(thetaOutput));
+    drivetrain.setControl(drive.withVelocityX(-drv.getLeftY() * MaxSpeed).withVelocityY(-drv.getLeftX() * MaxSpeed).withRotationalRate(thetaOutput * AngularRate));
+  }
+
+  public Translation2d getMovingSpeaker(boolean blue) {
+    Translation2d goalPose = blue ? Constants.Field.blueSpeaker : Constants.Field.redSpeaker;
+    ChassisSpeeds robotVel = drivetrain.getCurrentRobotChassisSpeeds();
+    double distanceToSpeaker = drivetrain.getState().Pose.getTranslation().getDistance(goalPose);
+    double x = goalPose.getX() - (robotVel.vxMetersPerSecond * (distanceToSpeaker / Constants.Field.noteVelocity));
+    double y = goalPose.getY() - (robotVel.vyMetersPerSecond * (distanceToSpeaker / Constants.Field.noteVelocity));
+    return new Translation2d(x, y);
   }
 
   public void setLEDs() {
