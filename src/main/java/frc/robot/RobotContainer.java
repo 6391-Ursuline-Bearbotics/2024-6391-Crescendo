@@ -166,9 +166,9 @@ public class RobotContainer {
 
     // TRIGGERS==================================================================
     // When a note is detected by the camera near the intake turn the lights green
-    Trigger noteTrigger = new Trigger(() -> intakeCamera.hasTarget());
-    noteTrigger.onTrue(runOnce(() -> SmartDashboard.putBoolean("noteFound", true)));
-    noteTrigger.onFalse(runOnce(() -> SmartDashboard.putBoolean("noteFound", false)));
+    //Trigger noteTrigger = new Trigger(() -> intakeCamera.hasTarget());
+    //noteTrigger.onTrue(runOnce(() -> SmartDashboard.putBoolean("noteFound", true)));
+    //noteTrigger.onFalse(runOnce(() -> SmartDashboard.putBoolean("noteFound", false)));
 
     Trigger controlPick = new Trigger(() -> lastControl != controlChooser.getSelected());
     controlPick.onTrue(runOnce(() -> newControlStyle()));
@@ -227,6 +227,7 @@ public class RobotContainer {
     shooterCamera = new Limelight(drivetrain, "limelight");
 
     autoAim.HeadingController.setPID(4.0, 0.0, 0.5);
+    autoAim.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
 
     //PPHolonomicDriveController.setRotationTargetOverride(Optional.of(getSpeakerRotation()));
 
@@ -378,8 +379,7 @@ public class RobotContainer {
   }
 
   private Rotation2d getSpeakerRotation() {
-    var alliance = DriverStation.getAlliance();
-    if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+    if (!blue) {
       speaker = Constants.Field.redSpeaker;
     } else {
       speaker = Constants.Field.blueSpeaker; //getMovingSpeaker(true);
@@ -392,6 +392,10 @@ public class RobotContainer {
   }
 
   private void autoAim() {
+    Rotation2d speaker = getSpeakerRotation();
+    if (blue) {
+      speaker = speaker.plus(new Rotation2d(Math.PI));
+    }
     drivetrain.setControl(autoAim.withVelocityX(-drv.getLeftY() * MaxSpeed).withVelocityY(-drv.getLeftX() * MaxSpeed).withTargetDirection(getSpeakerRotation()));
   }
 
