@@ -178,6 +178,7 @@ public class RobotContainer {
 
     // Turn the intake off whenever the note gets to the sensor
     intake.getIntakeSensor().onTrue(intake.intakeOff()
+        .alongWith(arm.setStorePosition())
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true))));
     intake.getIntakeSensor().onFalse(
         new WaitCommand(0.2).andThen(shooter.setOffSpeed())

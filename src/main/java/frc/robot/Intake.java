@@ -14,11 +14,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Intake extends SubsystemBase {
-  private static final int intakePrimaryID = 9;
+  private static final int intakePrimaryID = 5;
   private static final int intakeSensorPort = 0;
   private CANSparkMax m_motor;
 
-  private static final double intakeSpeed = 0.5;
+  private static final double intakeSpeed = 0.6;
   private DigitalInput noteSensor = new DigitalInput(intakeSensorPort);
 
   /** Creates a new Arm. */
@@ -33,15 +33,15 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeOn() {
-    return this.runOnce(() -> m_motor.set(intakeSpeed));
+    return this.runOnce(() -> m_motor.setVoltage(intakeSpeed * 12));
   }
 
   public Command intakeOff() {
-    return this.runOnce(() -> m_motor.set(0));
+    return this.runOnce(() -> m_motor.setVoltage(0));
   }
 
   public Command shoot() {
-    return this.runOnce(() -> m_motor.set(intakeSpeed)).withTimeout(0.2)
+    return this.runOnce(() -> m_motor.setVoltage(intakeSpeed * 12)).withTimeout(0.2)
         .andThen(this.runOnce(() -> m_motor.set(0)));
   }
 

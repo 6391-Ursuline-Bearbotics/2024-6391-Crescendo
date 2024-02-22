@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
@@ -24,8 +25,10 @@ public class Arm extends SubsystemBase {
   private CANSparkMax m_motor;
   private CANSparkMax m_follower;
   private SparkPIDController m_pidController;
+  private RelativeEncoder m_relativeEncoder;
   private SparkAbsoluteEncoder m_absoluteEncoder;
   private ArmFeedforward m_armFF;
+  private Boolean disabled = false;
 
   // Arm setpoints in  rotations
   private static final double intakePosition = 0.0;
@@ -57,6 +60,8 @@ public class Arm extends SubsystemBase {
     m_follower.setIdleMode(IdleMode.kBrake);
     m_follower.follow(m_motor);
 
+    // Get integrated NEO encoder
+    m_relativeEncoder = m_motor.getEncoder();
     // REV Throughbore encoder hooked to SparkMAX using the Absolute Encoder Adapter
     m_absoluteEncoder = m_motor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
     //m_absoluteEncoder.setPositionConversionFactor((2 * Math.PI));
@@ -86,14 +91,22 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Update the Trapezoid profile
-    m_state = m_profile.calculate(0.02, m_goal, m_state);
-    // Calculate the "feedforward" from the current angle turning it into a form of feedback
-    double position = m_absoluteEncoder.getPosition();
-    SmartDashboard.putNumber("Arm Position", position);
-    double feedforward = m_armFF.calculate(position * 2 * Math.PI, m_state.velocity);
-    // Add the feedforward to the PID output to get the motor output
-    m_pidController.setReference(m_state.position, ControlType.kPosition, 0, feedforward);
+    // Stop the arm if the relative encoder has velocity but the absolute doesn't
+    if ((m_relativeEncoder.getVelocity() > 1 && m_absoluteEncoder.getVelocity() < 1)
+        || (Math.abs(m_motor.getOutputCurrent() - m_follower.getOutputCurrent()) > 50)) {
+      disabled = true;
+    }
+
+    if (!disabled) {
+      // Update the Trapezoid profile
+      m_state = m_profile.calculate(0.02, m_goal, m_state);
+      // Calculate the "feedforward" from the current angle turning it into a form of feedback
+      double position = m_absoluteEncoder.getPosition();
+      SmartDashboard.putNumber("Arm Position", position);
+      double feedforward = m_armFF.calculate(position * 2 * Math.PI, m_state.velocity);
+      // Add the feedforward to the PID output to get the motor output
+      m_pidController.setReference(m_state.position, ControlType.kPosition, 0, feedforward);
+    }
   }
 
   public Command setIntakePosition() {

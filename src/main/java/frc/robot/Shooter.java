@@ -12,9 +12,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
 
-  private final TalonFX m_shooterMotor = new TalonFX(0);
-  private final TalonFX m_shooterMotor2 = new TalonFX(1);
+  private final TalonFX m_shooterMotor = new TalonFX(3);
+  private final TalonFX m_shooterMotor2 = new TalonFX(4);
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
+  private int kErrThreshold = 1;
+  private int kLoopsToSettle = 10; // how many loops sensor must be close-enough
+  private int _withinThresholdLoops = 0;
 
   // The shooter subsystem for the robot.
   public Shooter() {
@@ -24,8 +27,9 @@ public class Shooter extends SubsystemBase {
     flywheelTalonConfig.Slot0.kP = 0.1;
     flywheelTalonConfig.Slot0.kD = 0;
     m_shooterMotor.getConfigurator().apply(flywheelTalonConfig);
+    m_shooterMotor2.getConfigurator().apply(flywheelTalonConfig);
 
-    m_shooterMotor2.setControl(new Follower(0, true));
+    m_shooterMotor2.setControl(new Follower(3, true));
   }
 
   public double getShooterSpeed() {
@@ -37,7 +41,15 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean atSetpoint() {
-    return true;
+    /* Check if closed loop error is within the threshld */
+    if (m_shooterMotor.getClosedLoopError().getValue() < +kErrThreshold &&
+      m_shooterMotor.getClosedLoopError().getValue() > -kErrThreshold) {
+
+      ++_withinThresholdLoops;
+    } else {
+      _withinThresholdLoops = 0;
+    }
+    return _withinThresholdLoops > kLoopsToSettle;
   }
 
   public void setRPS(double rps) {
