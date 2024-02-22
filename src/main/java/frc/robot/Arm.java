@@ -13,13 +13,14 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
-  private static final int armPrimaryID = 1;
-  private static final int armFollowerID = 2;
+  private static final int armPrimaryID = 2;
+  private static final int armFollowerID = 1;
   private CANSparkMax m_motor;
   private CANSparkMax m_follower;
   private SparkPIDController m_pidController;
@@ -28,14 +29,15 @@ public class Arm extends SubsystemBase {
 
   // Arm setpoints in  rotations
   private static final double intakePosition = 0.0;
-  private static final double shootPosition = 0.0;
-  private static final double ampPosition = 0.0;
+  private static final double shootPosition = 0.08;
+  private static final double storePosition = 0.15;
+  private static final double ampPosition = 0.25;
 
   // Arm Contraints
-  private static final double kMaxVelocityRadPerSecond = 0.0;
-  private static final double kMaxAccelerationRadPerSecSquared = 0.0;
+  private static final double kMaxVelocityRadPerSecond = Math.PI / 2; // 90deg per second
+  private static final double kMaxAccelerationRadPerSecSquared = Math.PI;
   // The value (inverted) when measured parallel to the ground making it 0
-  private static final double kArmOffsetRads = 0.0;
+  private static final double kArmOffsetRads = 0.332;
 
   // Profile Setup
   private final TrapezoidProfile m_profile;
@@ -49,15 +51,15 @@ public class Arm extends SubsystemBase {
     m_follower = new CANSparkMax(armFollowerID, MotorType.kBrushless);
     m_motor.restoreFactoryDefaults();
     m_follower.restoreFactoryDefaults();
-    m_motor.setInverted(false);
-    m_follower.setInverted(true);
+    m_motor.setInverted(true);
+    m_follower.setInverted(false);
     m_motor.setIdleMode(IdleMode.kBrake);
     m_follower.setIdleMode(IdleMode.kBrake);
     m_follower.follow(m_motor);
 
     // REV Throughbore encoder hooked to SparkMAX using the Absolute Encoder Adapter
     m_absoluteEncoder = m_motor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-    m_absoluteEncoder.setPositionConversionFactor((2 * Math.PI));
+    //m_absoluteEncoder.setPositionConversionFactor((2 * Math.PI));
     m_absoluteEncoder.setInverted(false);
     m_absoluteEncoder.setZeroOffset(kArmOffsetRads);
 
@@ -68,12 +70,12 @@ public class Arm extends SubsystemBase {
     m_pidController.setD(0);
     m_pidController.setIZone(0);
     m_pidController.setFF(0);
-    m_pidController.setOutputRange(-0.25, 0.25);
+    m_pidController.setOutputRange(-0.2, 0.2);
     m_pidController.setFeedbackDevice(m_absoluteEncoder);
 
     m_motor.burnFlash();
 
-    m_armFF = new ArmFeedforward(0, 0.1, 0);
+    m_armFF = new ArmFeedforward(0, 0.96, 0);
 
     m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
         kMaxVelocityRadPerSecond, kMaxAccelerationRadPerSecSquared));
@@ -87,7 +89,9 @@ public class Arm extends SubsystemBase {
     // Update the Trapezoid profile
     m_state = m_profile.calculate(0.02, m_goal, m_state);
     // Calculate the "feedforward" from the current angle turning it into a form of feedback
-    double feedforward = m_armFF.calculate(m_absoluteEncoder.getPosition(), m_state.velocity);
+    double position = m_absoluteEncoder.getPosition();
+    SmartDashboard.putNumber("Arm Position", position);
+    double feedforward = m_armFF.calculate(position * 2 * Math.PI, m_state.velocity);
     // Add the feedforward to the PID output to get the motor output
     m_pidController.setReference(m_state.position, ControlType.kPosition, 0, feedforward);
   }
@@ -104,8 +108,12 @@ public class Arm extends SubsystemBase {
     return setArmGoalCommand(ampPosition);
   }
 
-  public Command setArmGoalCommand(double kArmOffsetRads) {
-    return Commands.runOnce(() -> setGoal(kArmOffsetRads), this);
+  public Command setStorePosition() {
+    return setArmGoalCommand(storePosition);
+  }
+
+  public Command setArmGoalCommand(double goal) {
+    return Commands.runOnce(() -> setGoal(goal), this);
   }
 
   /**
