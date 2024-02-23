@@ -16,7 +16,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
@@ -30,11 +29,13 @@ public class Arm extends SubsystemBase {
   private ArmFeedforward m_armFF;
   private Boolean disabled = false;
 
-  // Arm setpoints in  rotations
+  // Arm setpoints in degrees
   private static final double intakePosition = 0.0;
-  private static final double shootPosition = 0.08;
-  private static final double storePosition = 0.15;
-  private static final double ampPosition = 0.25;
+  private static final double subwooferPosition = 7.0;
+  private static final double autoPosition = 22.0;
+  private static final double wingPosition = 40.0;
+  private static final double storePosition = 45.0;
+  private static final double ampPosition = 90.0;
 
   // Arm Contraints
   private static final double kMaxVelocityRadPerSecond = Math.PI / 2; // 90deg per second
@@ -95,6 +96,7 @@ public class Arm extends SubsystemBase {
     if ((m_relativeEncoder.getVelocity() > 1 && m_absoluteEncoder.getVelocity() < 1)
         || (Math.abs(m_motor.getOutputCurrent() - m_follower.getOutputCurrent()) > 50)) {
       disabled = true;
+      m_motor.set(0);
     }
 
     if (!disabled) {
@@ -102,7 +104,8 @@ public class Arm extends SubsystemBase {
       m_state = m_profile.calculate(0.02, m_goal, m_state);
       // Calculate the "feedforward" from the current angle turning it into a form of feedback
       double position = m_absoluteEncoder.getPosition();
-      SmartDashboard.putNumber("Arm Position", position);
+      SmartDashboard.putNumber("Arm Position", position * 360.0);
+      SmartDashboard.putNumber("Arm Setpoint", m_state.position);
       double feedforward = m_armFF.calculate(position * 2 * Math.PI, m_state.velocity);
       // Add the feedforward to the PID output to get the motor output
       m_pidController.setReference(m_state.position, ControlType.kPosition, 0, feedforward);
@@ -113,8 +116,12 @@ public class Arm extends SubsystemBase {
     return setArmGoalCommand(intakePosition);
   }
 
-  public Command setShootPosition() {
-    return setArmGoalCommand(shootPosition);
+  public Command setAutoShootPosition() {
+    return setArmGoalCommand(autoPosition);
+  }
+
+  public Command setSubShootPosition() {
+    return setArmGoalCommand(subwooferPosition);
   }
 
   public Command setAmpPosition() {
@@ -125,16 +132,23 @@ public class Arm extends SubsystemBase {
     return setArmGoalCommand(storePosition);
   }
 
+    /**
+   * Gets a command that will set the position of the Arm.
+   *
+   * @param goal The goal position for the arm in degrees.
+   * 
+   * @return Command thats sets the trapezoid profile goal for the arm subsystem
+   */
   public Command setArmGoalCommand(double goal) {
-    return Commands.runOnce(() -> setGoal(goal), this);
+    return runOnce(() -> setGoal(goal));
   }
 
   /**
-   * Sets the goal state for the subsystem. Goal velocity assumed to be zero.
+   * Sets the goal state for the arm. Goal velocity assumed to be zero.
    *
-   * @param goal The goal position for the subsystem's motion profile.
+   * @param goal The goal position for the arm's motion profile.  In degrees
    */
   public final void setGoal(double goal) {
-    m_goal = new TrapezoidProfile.State(goal, 0);
+    m_goal = new TrapezoidProfile.State(goal / 360.0, 0);
   }
 }

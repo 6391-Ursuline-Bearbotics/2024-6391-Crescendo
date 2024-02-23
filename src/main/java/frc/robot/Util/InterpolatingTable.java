@@ -3,6 +3,9 @@ package frc.robot.Util;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
+
+import edu.wpi.first.math.util.Units;
+
 import static java.util.Map.entry;
 
 // Interpolating table
@@ -13,15 +16,10 @@ public class InterpolatingTable {
 
     // Interpolating tree map
     private static final TreeMap<Double, ShotParameter> map = new TreeMap<>(
-        Map.ofEntries(
-            entry(1.97, new ShotParameter(11, 2750)),
-            entry(2.77, new ShotParameter(18, 3000)),
-            entry(3.6, new ShotParameter(20, 3000)),
-            entry(4.5, new ShotParameter(24, 3000)),
-            entry(5.4, new ShotParameter(25.5, 3200)),
-            entry(6.4, new ShotParameter(25, 3250)),
-            entry(7.46, new ShotParameter(27, 3400)),
-            entry(8.47, new ShotParameter(34, 3850))
+        Map.ofEntries( // using pythag with 33" vertical distance between camera and speaker tag
+            entry(Units.inchesToMeters(50.32), new ShotParameter(7.0, 100)), // 37.991 along ground
+            entry(Units.inchesToMeters(125.16), new ShotParameter(22.0, 100)), // 120.732 along ground
+            entry(Units.inchesToMeters(231.63), new ShotParameter(40.0, 300)) // 229.263 along ground
         )
     );
 

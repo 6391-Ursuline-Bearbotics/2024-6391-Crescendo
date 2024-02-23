@@ -18,15 +18,27 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Center to 1"
+            "name": "armSubShootPosition"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "shooterAutoSpeed"
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Center to 1"
           }
         },
         {
@@ -36,21 +48,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "shooterAutoSpeed"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Center to 3"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "shooterAutoSpeed"
+            "pathName": "Center to Mid2"
           }
         }
       ]

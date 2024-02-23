@@ -58,11 +58,11 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command setAutoSpeed() {
-    return this.runOnce(() -> setRPS(300));
+    return this.runOnce(() -> setRPS(100));
   }
 
   public Command setAmpSpeed() {
-    return this.runOnce(() -> setRPS(1));
+    return this.runOnce(() -> setRPS(10));
   }
 
   public Command setOffSpeed() {

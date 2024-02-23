@@ -5,6 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.either;
+import static edu.wpi.first.wpilibj2.command.Commands.none;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 
 import java.util.Optional;
@@ -155,7 +156,7 @@ public class RobotContainer {
         .alongWith(intake.intakeOff()));
 
     // Get ready to score in the Speaker
-    op.b().onTrue(arm.setShootPosition()
+    op.b().onTrue(arm.setAutoShootPosition()
         .alongWith(shooter.setAutoSpeed())
         .alongWith(intake.intakeOff()));
 
@@ -177,7 +178,7 @@ public class RobotContainer {
     speedPick.onTrue(runOnce(() -> newSpeed()));
 
     // Turn the intake off whenever the note gets to the sensor
-    intake.getIntakeSensor().onTrue(intake.intakeOff()
+    intake.getIntakeSensor().onTrue(intake.intakeSlow()
         .alongWith(arm.setStorePosition())
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true))));
     intake.getIntakeSensor().onFalse(
@@ -218,7 +219,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("shooterOffSpeed", shooter.setOffSpeed());
     NamedCommands.registerCommand("shoot", intake.shoot());
     NamedCommands.registerCommand("armIntakePosition", arm.setIntakePosition());
-    NamedCommands.registerCommand("armShootPosition", arm.setShootPosition());
+    NamedCommands.registerCommand("armAutoShootPosition", arm.setAutoShootPosition());
+    NamedCommands.registerCommand("armSubShootPosition", arm.setSubShootPosition());
     NamedCommands.registerCommand("armAmpPosition", arm.setAmpPosition());
     NamedCommands.registerCommand("intakeOn", intake.intakeOn());
     NamedCommands.registerCommand("intakeOff", intake.intakeOff());
@@ -336,7 +338,7 @@ public class RobotContainer {
 
   private Command distanceShot(double distance) {
     ShotParameter shot = InterpolatingTable.get(distance);
-    return shooter.runOnce(() -> shooter.setRPS(shot.rpm / 60.0))
+    return shooter.runOnce(() -> shooter.setRPS(shot.rps))
       .alongWith(arm.runOnce(() -> arm.setGoal(shot.angle)));
   }
 

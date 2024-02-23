@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2736970928487312,
+        "x": 1.27,
         "y": 5.513288844759509
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4118040963354654,
+        "x": 2.4081070034867342,
         "y": 5.513288844759509
       },
       "isLocked": false,
@@ -32,11 +32,11 @@
     },
     {
       "anchor": {
-        "x": 1.2736970928487312,
+        "x": 1.27,
         "y": 5.513288844759509
       },
       "prevControl": {
-        "x": 2.7936970928487312,
+        "x": 2.79,
         "y": 5.513288844759509
       },
       "nextControl": null,
@@ -71,7 +71,7 @@
       }
     },
     {
-      "name": "Shoot",
+      "name": "After Intake",
       "waypointRelativePos": 1.0,
       "command": {
         "type": "parallel",
@@ -80,13 +80,24 @@
             {
               "type": "named",
               "data": {
-                "name": "intakeOff"
+                "name": "armSubShootPosition"
               }
-            },
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 2.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
             {
               "type": "named",
               "data": {
-                "name": "armShootPosition"
+                "name": "shoot"
               }
             }
           ]
