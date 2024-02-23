@@ -156,7 +156,7 @@ public class RobotContainer {
         .alongWith(intake.intakeOff()));
 
     // Get ready to score in the Speaker
-    op.b().onTrue(arm.setAutoShootPosition()
+    op.b().onTrue(arm.setSubShootPosition()
         .alongWith(shooter.setAutoSpeed())
         .alongWith(intake.intakeOff()));
 

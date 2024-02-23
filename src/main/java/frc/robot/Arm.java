@@ -32,7 +32,7 @@ public class Arm extends SubsystemBase {
   // Arm setpoints in degrees
   private static final double intakePosition = 0.0;
   private static final double subwooferPosition = 7.0;
-  private static final double autoPosition = 22.0;
+  private static final double autoPosition = 24.0;
   private static final double wingPosition = 40.0;
   private static final double storePosition = 45.0;
   private static final double ampPosition = 90.0;
@@ -41,7 +41,7 @@ public class Arm extends SubsystemBase {
   private static final double kMaxVelocityRadPerSecond = Math.PI / 2; // 90deg per second
   private static final double kMaxAccelerationRadPerSecSquared = Math.PI;
   // The value (inverted) when measured parallel to the ground making it 0
-  private static final double kArmOffsetRads = 0.332;
+  private static final double kArmOffsetRads = 0.668;
 
   // Profile Setup
   private final TrapezoidProfile m_profile;
@@ -56,22 +56,21 @@ public class Arm extends SubsystemBase {
     m_motor.restoreFactoryDefaults();
     m_follower.restoreFactoryDefaults();
     m_motor.setInverted(true);
-    m_follower.setInverted(false);
     m_motor.setIdleMode(IdleMode.kBrake);
     m_follower.setIdleMode(IdleMode.kBrake);
-    m_follower.follow(m_motor);
+    m_follower.follow(m_motor, true);
 
     // Get integrated NEO encoder
     m_relativeEncoder = m_motor.getEncoder();
     // REV Throughbore encoder hooked to SparkMAX using the Absolute Encoder Adapter
     m_absoluteEncoder = m_motor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
     //m_absoluteEncoder.setPositionConversionFactor((2 * Math.PI));
-    m_absoluteEncoder.setInverted(false);
+    m_absoluteEncoder.setInverted(true);
     m_absoluteEncoder.setZeroOffset(kArmOffsetRads);
 
     // Setting up the onboard PID controller on the SparkMAX
     m_pidController = m_motor.getPIDController();
-    m_pidController.setP(0.1);
+    m_pidController.setP(2);
     m_pidController.setI(0);
     m_pidController.setD(0);
     m_pidController.setIZone(0);
@@ -93,19 +92,19 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
     // Stop the arm if the relative encoder has velocity but the absolute doesn't
-    if ((m_relativeEncoder.getVelocity() > 1 && m_absoluteEncoder.getVelocity() < 1)
+/*     if ((m_relativeEncoder.getVelocity() > 1 && m_absoluteEncoder.getVelocity() < 1)
         || (Math.abs(m_motor.getOutputCurrent() - m_follower.getOutputCurrent()) > 50)) {
       disabled = true;
       m_motor.set(0);
-    }
+    } */
 
     if (!disabled) {
       // Update the Trapezoid profile
       m_state = m_profile.calculate(0.02, m_goal, m_state);
       // Calculate the "feedforward" from the current angle turning it into a form of feedback
       double position = m_absoluteEncoder.getPosition();
-      SmartDashboard.putNumber("Arm Position", position * 360.0);
-      SmartDashboard.putNumber("Arm Setpoint", m_state.position);
+      SmartDashboard.putNumber("Arm Position", position * 120.0);
+      SmartDashboard.putNumber("Arm Setpoint", m_state.position * 120.0);
       double feedforward = m_armFF.calculate(position * 2 * Math.PI, m_state.velocity);
       // Add the feedforward to the PID output to get the motor output
       m_pidController.setReference(m_state.position, ControlType.kPosition, 0, feedforward);
@@ -149,6 +148,6 @@ public class Arm extends SubsystemBase {
    * @param goal The goal position for the arm's motion profile.  In degrees
    */
   public final void setGoal(double goal) {
-    m_goal = new TrapezoidProfile.State(goal / 360.0, 0);
+    m_goal = new TrapezoidProfile.State(goal / 120.0, 0);
   }
 }
