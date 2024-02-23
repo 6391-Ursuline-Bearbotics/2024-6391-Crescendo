@@ -26,7 +26,7 @@ public class Intake extends SubsystemBase {
     // initialize motor
     m_motor = new CANSparkMax(intakePrimaryID, MotorType.kBrushless);
     m_motor.restoreFactoryDefaults();
-    m_motor.setInverted(false);
+    m_motor.setInverted(true);
     m_motor.setIdleMode(IdleMode.kBrake);
     m_motor.enableVoltageCompensation(12);
     m_motor.burnFlash();
@@ -41,11 +41,11 @@ public class Intake extends SubsystemBase {
   }
 
   public Command shoot() {
-    return this.runOnce(() -> m_motor.setVoltage(intakeSpeed * 12)).withTimeout(0.2)
+    return this.run(() -> m_motor.setVoltage(intakeSpeed * 12)).withTimeout(0.2)
         .andThen(this.runOnce(() -> m_motor.set(0)));
   }
 
   public Trigger getIntakeSensor() {
-    return new Trigger(() -> noteSensor.get());
+    return new Trigger(() -> !noteSensor.get());
   }
 }

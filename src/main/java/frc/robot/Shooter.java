@@ -26,10 +26,11 @@ public class Shooter extends SubsystemBase {
     flywheelTalonConfig.MotorOutput.PeakReverseDutyCycle = 0; // Never go in reverse
     flywheelTalonConfig.Slot0.kP = 0.1;
     flywheelTalonConfig.Slot0.kD = 0;
+    m_shooterMotor.setInverted(false);
     m_shooterMotor.getConfigurator().apply(flywheelTalonConfig);
     m_shooterMotor2.getConfigurator().apply(flywheelTalonConfig);
 
-    m_shooterMotor2.setControl(new Follower(3, true));
+    m_shooterMotor2.setControl(new Follower(3, false));
   }
 
   public double getShooterSpeed() {
@@ -57,7 +58,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command setAutoSpeed() {
-    return this.runOnce(() -> setRPS(10));
+    return this.runOnce(() -> setRPS(300));
   }
 
   public Command setAmpSpeed() {
