@@ -28,6 +28,7 @@ public class Arm extends SubsystemBase {
   private SparkAbsoluteEncoder m_absoluteEncoder;
   private ArmFeedforward m_armFF;
   private Boolean disabled = false;
+  private Double position = 0.0;
 
   // Arm setpoints in degrees
   private static final double intakePosition = 0.0;
@@ -55,6 +56,8 @@ public class Arm extends SubsystemBase {
     m_follower = new CANSparkMax(armFollowerID, MotorType.kBrushless);
     m_motor.restoreFactoryDefaults();
     m_follower.restoreFactoryDefaults();
+    m_motor.setSmartCurrentLimit(50);
+    m_follower.setSmartCurrentLimit(50);
     m_motor.setInverted(true);
     m_motor.setIdleMode(IdleMode.kBrake);
     m_follower.setIdleMode(IdleMode.kBrake);
@@ -79,6 +82,7 @@ public class Arm extends SubsystemBase {
     m_pidController.setFeedbackDevice(m_absoluteEncoder);
 
     m_motor.burnFlash();
+    m_follower.burnFlash();
 
     m_armFF = new ArmFeedforward(0, 0.96, 0);
 
@@ -102,7 +106,7 @@ public class Arm extends SubsystemBase {
       // Update the Trapezoid profile
       m_state = m_profile.calculate(0.02, m_goal, m_state);
       // Calculate the "feedforward" from the current angle turning it into a form of feedback
-      double position = m_absoluteEncoder.getPosition();
+      position = m_absoluteEncoder.getPosition();
       SmartDashboard.putNumber("Arm Position", position * 120.0);
       SmartDashboard.putNumber("Arm Setpoint", m_state.position * 120.0);
       double feedforward = m_armFF.calculate(position * 2 * Math.PI, m_state.velocity);
@@ -111,8 +115,16 @@ public class Arm extends SubsystemBase {
     }
   }
 
+  public Command setCurrentPosition() {
+    return setArmGoalCommand(position);
+  }
+
   public Command setIntakePosition() {
     return setArmGoalCommand(intakePosition);
+  }
+
+  public Command setWingShootPosition() {
+    return setArmGoalCommand(wingPosition);
   }
 
   public Command setAutoShootPosition() {

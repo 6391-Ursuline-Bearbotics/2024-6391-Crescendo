@@ -5,10 +5,8 @@
 package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.either;
-import static edu.wpi.first.wpilibj2.command.Commands.none;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.Utils;
@@ -64,15 +62,15 @@ public class RobotContainer {
   // Slew Rate Limiters to limit acceleration of joystick inputs
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(2);
   private final SlewRateLimiter yLimiter = new SlewRateLimiter(2);
-  private final SlewRateLimiter rotLimiter = new SlewRateLimiter(0.5);
+  private final SlewRateLimiter rotLimiter = new SlewRateLimiter(2);
 
   // Starting the other subsystems
   private final LEDSubsystem lights = new LEDSubsystem();
   public final Detector intakeCamera = new Detector("limelight-note");
   private final Limelight shooterCamera;
-  private final Arm arm = new Arm();
-  private final Shooter shooter = new Shooter();
-  private final Intake intake = new Intake();
+  public final Arm arm = new Arm();
+  public final Shooter shooter = new Shooter();
+  public final Intake intake = new Intake();
   
   // Field-centric driving in Open Loop, can change to closed loop after characterization 
   // For closed loop replace DriveRequestType.OpenLoopVoltage with DriveRequestType.Velocity
@@ -155,15 +153,38 @@ public class RobotContainer {
         .alongWith(shooter.setAmpSpeed())
         .alongWith(intake.intakeOff()));
 
-    // Get ready to score in the Speaker
-    op.b().onTrue(arm.setSubShootPosition()
-        .alongWith(shooter.setAutoSpeed())
+    // Store the arm just inside the frame perimeter
+    op.b().onTrue(arm.setStorePosition()
+        .alongWith(shooter.setOffSpeed())
         .alongWith(intake.intakeOff()));
 
     // Get ready to intake the note
     op.a().onTrue(arm.setIntakePosition()
         .alongWith(shooter.setOffSpeed())
         .alongWith(intake.intakeOn()));
+
+    // Shoot from the Wing Line
+    op.povUp().onTrue(arm.setWingShootPosition()
+        .alongWith(shooter.setWingSpeed())
+        .alongWith(intake.intakeOff()));    
+
+    // Shoot from the Auto Circle
+    op.povLeft().onTrue(arm.setAutoShootPosition()
+        .alongWith(shooter.setAutoSpeed())
+        .alongWith(intake.intakeOff()));
+
+    // Shoot from the Subwoofer
+    op.povDown().onTrue(arm.setSubShootPosition()
+        .alongWith(shooter.setAutoSpeed())
+        .alongWith(intake.intakeOff()));
+
+    // Shoot from Interpolated Spot
+    op.povLeft().onTrue(distanceShot(getSpeakerDistance())
+        .alongWith(intake.intakeOff()));
+
+    // Controls if the Robotic Pathing will drive to the speaker or amp
+    op.leftBumper().onTrue(runOnce(() -> SmartDashboard.putBoolean("speaker", true)));
+    op.rightBumper().onTrue(runOnce(() -> SmartDashboard.putBoolean("speaker", false)));
 
     // TRIGGERS==================================================================
     // When a note is detected by the camera near the intake turn the lights green
@@ -392,6 +413,14 @@ public class RobotContainer {
     SmartDashboard.putNumber("Auto Aim Robot", currentAngle.getRadians());
     SmartDashboard.putNumber("Auto Aim Setpoint", setpoint.getRadians());
     return setpoint;
+  }
+
+  private Double getSpeakerDistance() {
+    if (!blue) {
+      return drivetrain.getState().Pose.getTranslation().getDistance(Constants.Field.redSpeaker);
+    } else {
+      return drivetrain.getState().Pose.getTranslation().getDistance(Constants.Field.redSpeaker);
+    }
   }
 
   private void autoAim() {
