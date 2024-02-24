@@ -95,6 +95,7 @@ public class RobotContainer {
 
   private Translation2d speaker;
   private boolean blue = false;
+  private boolean turtle = false;
 
   private void configureBindings() {
     newControlStyle();
@@ -134,10 +135,14 @@ public class RobotContainer {
     drv.back().whileTrue(new DriveToGamePiece(drivetrain, intakeCamera));
 
     // Turtle Mode while held
-    drv.leftBumper().onTrue(runOnce(() -> MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * TurtleSpeed)
-        .andThen(() -> AngularRate = TurtleAngularRate));
-    drv.leftBumper().onFalse(runOnce(() -> MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * speedChooser.getSelected())
-        .andThen(() -> AngularRate = MaxAngularRate));
+    drv.leftBumper().onTrue(either(
+        runOnce(() -> MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * TurtleSpeed)
+            .andThen(() -> AngularRate = TurtleAngularRate)
+            .alongWith(runOnce(() -> turtle = false)),
+        runOnce(() -> MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * speedChooser.getSelected())
+            .andThen(() -> AngularRate = MaxAngularRate)
+            .alongWith(runOnce(() -> turtle = true)),
+        () -> turtle));
 
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
@@ -179,7 +184,7 @@ public class RobotContainer {
         .alongWith(intake.intakeOff()));
 
     // Shoot from Interpolated Spot
-    op.povLeft().onTrue(distanceShot(getSpeakerDistance())
+    op.povRight().onTrue(distanceShot(getSpeakerDistance())
         .alongWith(intake.intakeOff()));
 
     // Controls if the Robotic Pathing will drive to the speaker or amp
@@ -199,7 +204,7 @@ public class RobotContainer {
     speedPick.onTrue(runOnce(() -> newSpeed()));
 
     // Turn the intake off whenever the note gets to the sensor
-    intake.getIntakeSensor().onTrue(intake.intakeSlow()
+    intake.getIntakeSensor().onTrue(intake.intakeOff()
         .alongWith(arm.setStorePosition())
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true))));
     intake.getIntakeSensor().onFalse(

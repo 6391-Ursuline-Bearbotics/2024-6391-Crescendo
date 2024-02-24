@@ -98,7 +98,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
-        configNeutralMode(NeutralModeValue.Coast);
+        configNeutralMode(NeutralModeValue.Brake);
         configurePathPlanner();
         if (Utils.isSimulation()) {
             startSimThread();
@@ -107,7 +107,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
         super(driveTrainConstants, modules);
-        configNeutralMode(NeutralModeValue.Coast);
+        configNeutralMode(NeutralModeValue.Brake);
         configurePathPlanner();
         if (Utils.isSimulation()) {
             startSimThread();

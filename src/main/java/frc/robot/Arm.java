@@ -32,14 +32,14 @@ public class Arm extends SubsystemBase {
 
   // Arm setpoints in degrees
   private static final double intakePosition = 0.0;
-  private static final double subwooferPosition = 7.0;
-  private static final double autoPosition = 24.0;
-  private static final double wingPosition = 40.0;
+  private static final double subwooferPosition = 8.0;
+  private static final double autoPosition = 28.0;
+  private static final double wingPosition = 41.5;
   private static final double storePosition = 45.0;
   private static final double ampPosition = 90.0;
 
   // Arm Contraints
-  private static final double kMaxVelocityRadPerSecond = Math.PI / 2; // 90deg per second
+  private static final double kMaxVelocityRadPerSecond = Math.PI / 4; // 90deg per second
   private static final double kMaxAccelerationRadPerSecSquared = Math.PI;
   // The value (inverted) when measured parallel to the ground making it 0
   private static final double kArmOffsetRads = 0.668;
@@ -56,8 +56,8 @@ public class Arm extends SubsystemBase {
     m_follower = new CANSparkMax(armFollowerID, MotorType.kBrushless);
     m_motor.restoreFactoryDefaults();
     m_follower.restoreFactoryDefaults();
-    m_motor.setSmartCurrentLimit(50);
-    m_follower.setSmartCurrentLimit(50);
+    //m_motor.setSmartCurrentLimit(50);
+    //m_follower.setSmartCurrentLimit(50);
     m_motor.setInverted(true);
     m_motor.setIdleMode(IdleMode.kBrake);
     m_follower.setIdleMode(IdleMode.kBrake);
@@ -73,18 +73,18 @@ public class Arm extends SubsystemBase {
 
     // Setting up the onboard PID controller on the SparkMAX
     m_pidController = m_motor.getPIDController();
-    m_pidController.setP(2);
+    m_pidController.setP(4);
     m_pidController.setI(0);
     m_pidController.setD(0);
     m_pidController.setIZone(0);
     m_pidController.setFF(0);
-    m_pidController.setOutputRange(-0.2, 0.2);
+    m_pidController.setOutputRange(-0.3, 0.3);
     m_pidController.setFeedbackDevice(m_absoluteEncoder);
 
     m_motor.burnFlash();
     m_follower.burnFlash();
 
-    m_armFF = new ArmFeedforward(0, 0.96, 0);
+    m_armFF = new ArmFeedforward(2, 0.96, 0);
 
     m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
         kMaxVelocityRadPerSecond, kMaxAccelerationRadPerSecSquared));
