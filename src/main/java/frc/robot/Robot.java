@@ -4,9 +4,12 @@
 
 package frc.robot;
 
+import org.littletonrobotics.urcl.URCL;
+
 import com.ctre.phoenix6.SignalLogger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,7 +28,9 @@ public class Robot extends TimedRobot {
 
     m_robotContainer.drivetrain.getDaqThread().setThreadPriority(99);
 
+    DataLogManager.start();
     SignalLogger.start();
+    URCL.start();
   }
   @Override
   public void robotPeriodic() {
@@ -72,6 +77,7 @@ public class Robot extends TimedRobot {
 
     m_robotContainer.intakeCamera.setPipeline(1);
     stopAll();
+    m_robotContainer.createIntakeTrigger();
 
     // Sets the driver perspective to forward for Red Side
     m_robotContainer.drivetrain.setOperatorPerspectiveForward(Rotation2d.fromDegrees(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? 0 : 180));

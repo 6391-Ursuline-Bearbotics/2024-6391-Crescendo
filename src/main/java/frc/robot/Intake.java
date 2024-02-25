@@ -20,7 +20,7 @@ public class Intake extends SubsystemBase {
   private static final int intakeSensorPort = 0;
   private CANSparkMax m_motor;
 
-  private static final double intakeSpeed = 0.6;
+  private static final double intakeSpeed = 0.9;
   private static final double intakeSlowSpeed = 0.2;
   private DigitalInput noteSensor = new DigitalInput(intakeSensorPort);
 

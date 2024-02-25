@@ -95,6 +95,7 @@ public class RobotContainer {
 
   private Translation2d speaker;
   private boolean blue = false;
+  private boolean turtle = false;
 
   private void configureBindings() {
     newControlStyle();
@@ -134,10 +135,14 @@ public class RobotContainer {
     drv.back().whileTrue(new DriveToGamePiece(drivetrain, intakeCamera));
 
     // Turtle Mode while held
-    drv.leftBumper().onTrue(runOnce(() -> MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * TurtleSpeed)
-        .andThen(() -> AngularRate = TurtleAngularRate));
-    drv.leftBumper().onFalse(runOnce(() -> MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * speedChooser.getSelected())
-        .andThen(() -> AngularRate = MaxAngularRate));
+    drv.leftBumper().onTrue(either(
+        runOnce(() -> MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * TurtleSpeed)
+            .andThen(() -> AngularRate = TurtleAngularRate)
+            .alongWith(runOnce(() -> turtle = false)),
+        runOnce(() -> MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * speedChooser.getSelected())
+            .andThen(() -> AngularRate = MaxAngularRate)
+            .alongWith(runOnce(() -> turtle = true)),
+        () -> turtle));
 
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
@@ -179,7 +184,7 @@ public class RobotContainer {
         .alongWith(intake.intakeOff()));
 
     // Shoot from Interpolated Spot
-    op.povLeft().onTrue(distanceShot(getSpeakerDistance())
+    op.povRight().onTrue(distanceShot(getSpeakerDistance())
         .alongWith(intake.intakeOff()));
 
     // Controls if the Robotic Pathing will drive to the speaker or amp
@@ -197,14 +202,6 @@ public class RobotContainer {
 
     Trigger speedPick = new Trigger(() -> lastSpeed != speedChooser.getSelected());
     speedPick.onTrue(runOnce(() -> newSpeed()));
-
-    // Turn the intake off whenever the note gets to the sensor
-    intake.getIntakeSensor().onTrue(intake.intakeSlow()
-        .alongWith(arm.setStorePosition())
-        .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true))));
-    intake.getIntakeSensor().onFalse(
-        new WaitCommand(0.2).andThen(shooter.setOffSpeed())
-        .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", false))));
 
     // If all conditions met light LED green (may later auto shoot)
     Trigger readyToShoot = new Trigger(
@@ -225,6 +222,11 @@ public class RobotContainer {
 
     drv.b().and(drv.pov(0)).whileTrue(drivetrain.runSteerDynamTest(Direction.kForward));
     drv.b().and(drv.pov(180)).whileTrue(drivetrain.runSteerDynamTest(Direction.kReverse));
+
+    op.x().and(drv.pov(0)).whileTrue(arm.dynamicForward());
+    op.x().and(drv.pov(180)).whileTrue(arm.dynamicBackward());
+    op.x().and(drv.pov(270)).whileTrue(arm.quasistaticForward());
+    op.x().and(drv.pov(90)).whileTrue(arm.quasistaticBackward());
 
     // Drivetrain needs to be placed against a sturdy wall and test stopped immediately upon wheel slip
     drv.back().and(drv.pov(0)).whileTrue(drivetrain.runDriveSlipTest());
@@ -471,5 +473,15 @@ public class RobotContainer {
     } else {
       return botRoboticRoutine;
     }
+  }
+
+  public void createIntakeTrigger() {
+    // Turn the intake off whenever the note gets to the sensor
+    intake.getIntakeSensor().onTrue(intake.intakeOff()
+        .alongWith(arm.setStorePosition())
+        .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true))));
+    intake.getIntakeSensor().onFalse(
+        new WaitCommand(0.2).andThen(shooter.setOffSpeed())
+        .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", false))));
   }
 }

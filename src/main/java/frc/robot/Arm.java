@@ -17,6 +17,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+
+import static edu.wpi.first.units.Units.*;
 
 public class Arm extends SubsystemBase {
   private static final int armPrimaryID = 2;
@@ -29,12 +33,13 @@ public class Arm extends SubsystemBase {
   private ArmFeedforward m_armFF;
   private Boolean disabled = false;
   private Double position = 0.0;
+  private SysIdRoutine sysIdRoutine;
 
   // Arm setpoints in degrees
   private static final double intakePosition = 0.0;
-  private static final double subwooferPosition = 7.0;
-  private static final double autoPosition = 24.0;
-  private static final double wingPosition = 40.0;
+  private static final double subwooferPosition = 8.0;
+  private static final double autoPosition = 28.0;
+  private static final double wingPosition = 41.5;
   private static final double storePosition = 45.0;
   private static final double ampPosition = 90.0;
 
@@ -56,8 +61,8 @@ public class Arm extends SubsystemBase {
     m_follower = new CANSparkMax(armFollowerID, MotorType.kBrushless);
     m_motor.restoreFactoryDefaults();
     m_follower.restoreFactoryDefaults();
-    m_motor.setSmartCurrentLimit(50);
-    m_follower.setSmartCurrentLimit(50);
+    //m_motor.setSmartCurrentLimit(50);
+    //m_follower.setSmartCurrentLimit(50);
     m_motor.setInverted(true);
     m_motor.setIdleMode(IdleMode.kBrake);
     m_follower.setIdleMode(IdleMode.kBrake);
@@ -67,7 +72,6 @@ public class Arm extends SubsystemBase {
     m_relativeEncoder = m_motor.getEncoder();
     // REV Throughbore encoder hooked to SparkMAX using the Absolute Encoder Adapter
     m_absoluteEncoder = m_motor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-    //m_absoluteEncoder.setPositionConversionFactor((2 * Math.PI));
     m_absoluteEncoder.setInverted(true);
     m_absoluteEncoder.setZeroOffset(kArmOffsetRads);
 
@@ -83,6 +87,13 @@ public class Arm extends SubsystemBase {
 
     m_motor.burnFlash();
     m_follower.burnFlash();
+
+    sysIdRoutine = new SysIdRoutine(
+                new SysIdRoutine.Config(),
+                new SysIdRoutine.Mechanism(
+                        (voltage) -> m_motor.setVoltage(voltage.in(Volts)),
+                        null, // No log consumer, since data is recorded by URCL
+                        this));
 
     m_armFF = new ArmFeedforward(0, 0.96, 0);
 
@@ -109,6 +120,7 @@ public class Arm extends SubsystemBase {
       position = m_absoluteEncoder.getPosition();
       SmartDashboard.putNumber("Arm Position", position * 120.0);
       SmartDashboard.putNumber("Arm Setpoint", m_state.position * 120.0);
+      SmartDashboard.putNumber("Arm Current", m_motor.getOutputCurrent());
       double feedforward = m_armFF.calculate(position * 2 * Math.PI, m_state.velocity);
       // Add the feedforward to the PID output to get the motor output
       m_pidController.setReference(m_state.position, ControlType.kPosition, 0, feedforward);
@@ -162,4 +174,28 @@ public class Arm extends SubsystemBase {
   public final void setGoal(double goal) {
     m_goal = new TrapezoidProfile.State(goal / 120.0, 0);
   }
+
+  public Command quasistaticForward() {
+    return sysIdRoutine.quasistatic(Direction.kForward).until(() -> {
+        return m_absoluteEncoder.getPosition() >= 0.7;
+    });
+}
+
+public Command quasistaticBackward() {
+    return sysIdRoutine.quasistatic(Direction.kReverse).until(() -> {
+        return m_absoluteEncoder.getPosition() <= 0.05;
+    });
+}
+
+public Command dynamicForward() {
+    return sysIdRoutine.dynamic(Direction.kForward).until(() -> {
+        return m_absoluteEncoder.getPosition() >= 0.7;
+    });
+}
+
+public Command dynamicBackward() {
+    return sysIdRoutine.dynamic(Direction.kReverse).until(() -> {
+        return m_absoluteEncoder.getPosition() <= 0.05;
+    });
+}
 }

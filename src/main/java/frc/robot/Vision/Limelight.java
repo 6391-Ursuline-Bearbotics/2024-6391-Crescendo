@@ -47,7 +47,7 @@ public class Limelight extends SubsystemBase {
   @Override
   public void periodic() {
     if (enable && !RobotBase.isSimulation()) {
-      // Get the distance between the camera and the AprilTag, this will affect how much we trust the measurement
+/*       // Get the distance between the camera and the AprilTag, this will affect how much we trust the measurement
       targetDistance = LimelightHelpers.getTargetPose3d_CameraSpace(ll).getTranslation().getDistance(new Translation3d());
       // Tune this for your robot around how much variance you see in the pose at a given distance, higher = less trust
       Double lackconfidence = ((targetDistance - 1) / 6);
@@ -79,6 +79,20 @@ public class Limelight extends SubsystemBase {
           fieldError++;
           SmartDashboard.putNumber("Field Error", fieldError);
         }
+      } */
+
+      LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      if(limelightMeasurement.tagCount >= 2)
+      {
+        limelightPub.set(new double[] {
+          limelightMeasurement.pose.getX(),
+          limelightMeasurement.pose.getY(),
+          limelightMeasurement.pose.getRotation().getDegrees()
+        });
+        drivetrain.addVisionMeasurement(
+            limelightMeasurement.pose,
+            limelightMeasurement.timestampSeconds,
+            VecBuilder.fill(.7,.7,9999999));
       }
     }
   }
