@@ -22,8 +22,8 @@ import frc.robot.Util.RectanglePoseArea;
 public class Limelight extends SubsystemBase {
   CommandSwerveDrivetrain drivetrain;
   Alliance alliance;
-  private String ll = "limelight";
-  private Boolean enable = false;
+  private String ll = "limelight-tag";
+  private Boolean enable = true;
   private Boolean trust = false;
   private int fieldError = 0;
   private int distanceError = 0;
@@ -81,7 +81,8 @@ public class Limelight extends SubsystemBase {
         }
       } */
 
-      LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(ll);
+      SmartDashboard.putNumber("NumTags", limelightMeasurement.tagCount);
       if(limelightMeasurement.tagCount >= 2)
       {
         limelightPub.set(new double[] {
@@ -92,7 +93,7 @@ public class Limelight extends SubsystemBase {
         drivetrain.addVisionMeasurement(
             limelightMeasurement.pose,
             limelightMeasurement.timestampSeconds,
-            VecBuilder.fill(.7,.7,9999999));
+            VecBuilder.fill(.7,.7,99));
       }
     }
   }

@@ -1,0 +1,61 @@
+{
+  "NetworkTables": {
+    "retained": {
+      "SmartDashboard": {
+        "open": true
+      },
+      "limelight-tag": {
+        "double[]##v_/limelight-tag/botpose_wpiblue": {
+          "open": true
+        }
+      }
+    },
+    "transitory": {
+      "Pose": {
+        "double[]##v_/Pose/robotPose": {
+          "open": true
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Pose": "Field2d",
+      "/SmartDashboard/Auto Chooser": "String Chooser",
+      "/SmartDashboard/Control Chooser": "String Chooser",
+      "/SmartDashboard/Module 0": "Mechanism2d",
+      "/SmartDashboard/Module 1": "Mechanism2d",
+      "/SmartDashboard/Module 2": "Mechanism2d",
+      "/SmartDashboard/Module 3": "Mechanism2d",
+      "/SmartDashboard/Speed Limit": "String Chooser"
+    },
+    "windows": {
+      "/Pose": {
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Auto Chooser": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "visible": true
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "6391"
+  }
+}

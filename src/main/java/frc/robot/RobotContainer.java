@@ -211,22 +211,22 @@ public class RobotContainer {
     readyToShoot.onFalse(runOnce(() -> SmartDashboard.putBoolean("readyToShoot", false)));
 
     // All of these bindings are for System Indentification and will be disabled at competition
-    drv.x().and(drv.pov(0)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kForward));
-    drv.x().and(drv.pov(180)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kReverse));
+    drv.leftTrigger().and(drv.pov(0)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kForward));
+    drv.leftTrigger().and(drv.pov(180)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kReverse));
 
-    drv.y().and(drv.pov(0)).whileTrue(drivetrain.runDriveDynamTest(Direction.kForward));
-    drv.y().and(drv.pov(180)).whileTrue(drivetrain.runDriveDynamTest(Direction.kReverse));
+    drv.leftTrigger().and(drv.pov(270)).whileTrue(drivetrain.runDriveDynamTest(Direction.kForward));
+    drv.leftTrigger().and(drv.pov(90)).whileTrue(drivetrain.runDriveDynamTest(Direction.kReverse));
 
-    drv.a().and(drv.pov(0)).whileTrue(drivetrain.runSteerQuasiTest(Direction.kForward));
-    drv.a().and(drv.pov(180)).whileTrue(drivetrain.runSteerQuasiTest(Direction.kReverse));
+    drv.rightTrigger().and(drv.pov(0)).whileTrue(drivetrain.runSteerQuasiTest(Direction.kForward));
+    drv.rightTrigger().and(drv.pov(180)).whileTrue(drivetrain.runSteerQuasiTest(Direction.kReverse));
 
-    drv.b().and(drv.pov(0)).whileTrue(drivetrain.runSteerDynamTest(Direction.kForward));
-    drv.b().and(drv.pov(180)).whileTrue(drivetrain.runSteerDynamTest(Direction.kReverse));
+    drv.rightTrigger().and(drv.pov(270)).whileTrue(drivetrain.runSteerDynamTest(Direction.kForward));
+    drv.rightTrigger().and(drv.pov(90)).whileTrue(drivetrain.runSteerDynamTest(Direction.kReverse));
 
-    op.x().and(drv.pov(0)).whileTrue(arm.dynamicForward());
-    op.x().and(drv.pov(180)).whileTrue(arm.dynamicBackward());
-    op.x().and(drv.pov(270)).whileTrue(arm.quasistaticForward());
-    op.x().and(drv.pov(90)).whileTrue(arm.quasistaticBackward());
+    op.back().whileTrue(arm.dynamicForward());
+    op.start().whileTrue(arm.dynamicBackward());
+    op.leftTrigger().whileTrue(arm.quasistaticForward());
+    op.rightTrigger().whileTrue(arm.quasistaticBackward());
 
     // Drivetrain needs to be placed against a sturdy wall and test stopped immediately upon wheel slip
     drv.back().and(drv.pov(0)).whileTrue(drivetrain.runDriveSlipTest());
@@ -250,7 +250,7 @@ public class RobotContainer {
 
     drivetrain = TunerConstants.DriveTrain; // Make Drivetrain after Named Commands
     robo = new RoboticPathing();
-    shooterCamera = new Limelight(drivetrain, "limelight");
+    shooterCamera = new Limelight(drivetrain, "limelight-tag");
 
     autoAim.HeadingController.setPID(4.0, 0.0, 0.5);
     autoAim.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
