@@ -74,13 +74,17 @@ public class RobotContainer {
   
   // Field-centric driving in Open Loop, can change to closed loop after characterization 
   // For closed loop replace DriveRequestType.OpenLoopVoltage with DriveRequestType.Velocity
+  DriveRequestType controlType = DriveRequestType.OpenLoopVoltage;
   SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-      .withDriveRequestType(DriveRequestType.Velocity)
+      .withDriveRequestType(controlType)
       .withDeadband(0) // Deadband is handled on input
       .withRotationalDeadband(0);
 
   SwerveRequest.FieldCentricFacingAngle autoAim = new SwerveRequest.FieldCentricFacingAngle()
-      .withDriveRequestType(DriveRequestType.Velocity);
+      .withDriveRequestType(controlType);
+
+  SwerveRequest.RobotCentric robotDrive = new SwerveRequest.RobotCentric()
+      .withDriveRequestType(controlType);
 
   SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
@@ -143,6 +147,8 @@ public class RobotContainer {
             .andThen(() -> AngularRate = MaxAngularRate)
             .alongWith(runOnce(() -> turtle = true)),
         () -> turtle));
+
+    drv.rightBumper().whileTrue(drivetrain.run(() -> robotCentered()));
 
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
@@ -430,6 +436,10 @@ public class RobotContainer {
       speaker = speaker.plus(new Rotation2d(Math.PI));
     }
     drivetrain.setControl(autoAim.withVelocityX(-drv.getLeftY() * MaxSpeed).withVelocityY(-drv.getLeftX() * MaxSpeed).withTargetDirection(getSpeakerRotation()));
+  }
+
+  private void robotCentered() {
+    drivetrain.setControl(robotDrive.withVelocityX(-drv.getLeftY() * MaxSpeed).withVelocityY(-drv.getLeftX() * MaxSpeed).withRotationalRate(conditionRot(-drv.getRightX()) * AngularRate));
   }
 
   public Translation2d getMovingSpeaker(boolean blue) {
