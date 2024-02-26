@@ -138,7 +138,7 @@ public class RobotContainer {
     // Drives to the game piece using turn, it will not strafe
     drv.back().whileTrue(new DriveToGamePiece(drivetrain, intakeCamera));
 
-    // Turtle Mode while held
+    // Turtle Mode toggle
     drv.leftBumper().onTrue(either(
         runOnce(() -> MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * TurtleSpeed)
             .andThen(() -> AngularRate = TurtleAngularRate)
