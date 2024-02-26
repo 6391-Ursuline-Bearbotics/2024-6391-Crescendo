@@ -75,12 +75,12 @@ public class RobotContainer {
   // Field-centric driving in Open Loop, can change to closed loop after characterization 
   // For closed loop replace DriveRequestType.OpenLoopVoltage with DriveRequestType.Velocity
   SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+      .withDriveRequestType(DriveRequestType.Velocity)
       .withDeadband(0) // Deadband is handled on input
       .withRotationalDeadband(0);
 
   SwerveRequest.FieldCentricFacingAngle autoAim = new SwerveRequest.FieldCentricFacingAngle()
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+      .withDriveRequestType(DriveRequestType.Velocity);
 
   SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
@@ -193,9 +193,9 @@ public class RobotContainer {
 
     // TRIGGERS==================================================================
     // When a note is detected by the camera near the intake turn the lights green
-    //Trigger noteTrigger = new Trigger(() -> intakeCamera.hasTarget());
-    //noteTrigger.onTrue(runOnce(() -> SmartDashboard.putBoolean("noteFound", true)));
-    //noteTrigger.onFalse(runOnce(() -> SmartDashboard.putBoolean("noteFound", false)));
+    Trigger noteTrigger = new Trigger(() -> intakeCamera.hasTarget());
+    noteTrigger.onTrue(runOnce(() -> SmartDashboard.putBoolean("noteFound", true)));
+    noteTrigger.onFalse(runOnce(() -> SmartDashboard.putBoolean("noteFound", false)));
 
     Trigger controlPick = new Trigger(() -> lastControl != controlChooser.getSelected());
     controlPick.onTrue(runOnce(() -> newControlStyle()));
@@ -245,8 +245,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("armAutoShootPosition", arm.setAutoShootPosition());
     NamedCommands.registerCommand("armSubShootPosition", arm.setSubShootPosition());
     NamedCommands.registerCommand("armAmpPosition", arm.setAmpPosition());
-    NamedCommands.registerCommand("intakeOn", intake.intakeOn());
-    NamedCommands.registerCommand("intakeOff", intake.intakeOff());
+    NamedCommands.registerCommand("intakeOn", intake.intakeAutoStop());
 
     drivetrain = TunerConstants.DriveTrain; // Make Drivetrain after Named Commands
     robo = new RoboticPathing();
@@ -477,7 +476,7 @@ public class RobotContainer {
 
   public void createIntakeTrigger() {
     // Turn the intake off whenever the note gets to the sensor
-    intake.getIntakeSensor().onTrue(intake.intakeOff()
+    intake.getIntakeSensor().onTrue(intake.intakeStop()
         .alongWith(arm.setStorePosition())
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true))));
     intake.getIntakeSensor().onFalse(

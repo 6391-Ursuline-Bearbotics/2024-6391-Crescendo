@@ -179,23 +179,23 @@ public class Arm extends SubsystemBase {
     return sysIdRoutine.quasistatic(Direction.kForward).until(() -> {
         return m_absoluteEncoder.getPosition() >= 0.7;
     });
-}
+  }
 
-public Command quasistaticBackward() {
-    return sysIdRoutine.quasistatic(Direction.kReverse).until(() -> {
-        return m_absoluteEncoder.getPosition() <= 0.05;
-    });
-}
+  public Command quasistaticBackward() {
+      return sysIdRoutine.quasistatic(Direction.kReverse).until(() -> {
+          return m_absoluteEncoder.getPosition() <= 0.05;
+      });
+  }
 
-public Command dynamicForward() {
-    return sysIdRoutine.dynamic(Direction.kForward).until(() -> {
-        return m_absoluteEncoder.getPosition() >= 0.7;
-    });
-}
+  public Command dynamicForward() {
+      return sysIdRoutine.dynamic(Direction.kForward).until(() -> {
+          return m_absoluteEncoder.getPosition() >= 0.7;
+      });
+  }
 
-public Command dynamicBackward() {
-    return sysIdRoutine.dynamic(Direction.kReverse).until(() -> {
-        return m_absoluteEncoder.getPosition() <= 0.05;
-    });
-}
+  public Command dynamicBackward() {
+      return sysIdRoutine.dynamic(Direction.kReverse).until(() -> {
+          return m_absoluteEncoder.getPosition() <= 0.05;
+      });
+  }
 }

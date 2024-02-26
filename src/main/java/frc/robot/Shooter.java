@@ -23,7 +23,7 @@ public class Shooter extends SubsystemBase {
   public Shooter() {
     TalonFXConfiguration flywheelTalonConfig = new TalonFXConfiguration();
     flywheelTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    flywheelTalonConfig.MotorOutput.PeakReverseDutyCycle = 0; // Never go in reverse
+    flywheelTalonConfig.Voltage.PeakReverseVoltage = 0; // Never go in reverse
     flywheelTalonConfig.Slot0.kP = 0.1;
     flywheelTalonConfig.Slot0.kD = 0;
     m_shooterMotor.setInverted(false);

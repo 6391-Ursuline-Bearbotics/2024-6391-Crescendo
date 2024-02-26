@@ -39,8 +39,14 @@ public class Intake extends SubsystemBase {
     return this.runOnce(() -> m_motor.setVoltage(intakeSpeed * 12));
   }
 
-  public Command intakeSlow() {
-    return this.runOnce(() -> m_motor.setVoltage(intakeSlowSpeed * 12)).alongWith(waitSeconds(0.1)).andThen(intakeOff());
+  // This is a command for whatever process should take place after the first sensor is tripped
+  public Command intakeStop() {
+    return intakeOff();
+  }
+
+  // This starts the intake then stops it after 5 seconds or if a note is detected
+  public Command intakeAutoStop() {
+    return this.run(() -> m_motor.setVoltage(intakeSpeed * 12)).until(() -> !noteSensor.get()).withTimeout(5).andThen(intakeStop());
   }
 
   public Command intakeOff() {
