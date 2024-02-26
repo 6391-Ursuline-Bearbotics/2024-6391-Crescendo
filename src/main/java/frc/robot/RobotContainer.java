@@ -257,7 +257,7 @@ public class RobotContainer {
     robo = new RoboticPathing();
     shooterCamera = new Limelight(drivetrain, "limelight-tag");
 
-    autoAim.HeadingController.setPID(4.0, 0.0, 0.5);
+    autoAim.HeadingController.setPID(2.0, 0.0, 0.5);
     autoAim.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
 
     //PPHolonomicDriveController.setRotationTargetOverride(Optional.of(getSpeakerRotation()));
@@ -435,7 +435,7 @@ public class RobotContainer {
     if (blue) {
       speaker = speaker.plus(new Rotation2d(Math.PI));
     }
-    drivetrain.setControl(autoAim.withVelocityX(-drv.getLeftY() * MaxSpeed).withVelocityY(-drv.getLeftX() * MaxSpeed).withTargetDirection(getSpeakerRotation()));
+    drivetrain.setControl(autoAim.withVelocityX(-drv.getLeftY() * MaxSpeed).withVelocityY(-drv.getLeftX() * MaxSpeed).withTargetDirection(speaker));
   }
 
   private void robotCentered() {

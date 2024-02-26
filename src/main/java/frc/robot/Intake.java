@@ -54,7 +54,7 @@ public class Intake extends SubsystemBase {
   }
 
   public Command shoot() {
-    return this.run(() -> m_motor.setVoltage(intakeSpeed * 12)).withTimeout(0.2)
+    return this.run(() -> m_motor.setVoltage(intakeSpeed * 12)).withTimeout(0.3)
         .andThen(this.runOnce(() -> m_motor.set(0)));
   }
 
