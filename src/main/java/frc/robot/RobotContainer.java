@@ -48,7 +48,7 @@ public class RobotContainer {
   private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps; // Initial max is true top speed
   private final double TurtleSpeed = 0.1; // Reduction in speed from Max Speed, 0.1 = 10%
   private final double MaxAngularRate = Math.PI * 1.5; // .75 rotation per second max angular velocity.  Adjust for max turning rate speed.
-  private final double TurtleAngularRate = Math.PI * 0.5; // .75 rotation per second max angular velocity.  Adjust for max turning rate speed.
+  private final double TurtleAngularRate = Math.PI * 0.5; // .25 rotation per second max angular velocity.  Adjust for max turning rate speed.
   private double AngularRate = MaxAngularRate; // This will be updated when turtle and reset to MaxAngularRate
 
   /* Setting up bindings for necessary control of the swerve drive platform */
@@ -89,8 +89,6 @@ public class RobotContainer {
   SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
   Telemetry logger = new Telemetry(MaxSpeed);
-
-  Pose2d odomStart = new Pose2d(0, 0, new Rotation2d(0, 0));
 
   private Supplier<SwerveRequest> controlStyle;
 
@@ -190,12 +188,19 @@ public class RobotContainer {
         .alongWith(intake.intakeOff()));
 
     // Shoot from Interpolated Spot
-    op.povRight().onTrue(distanceShot(getSpeakerDistance())
+    op.povRight().whileTrue(distanceShot(getSpeakerDistance()).repeatedly()
         .alongWith(intake.intakeOff()));
 
     // Controls if the Robotic Pathing will drive to the speaker or amp
     op.leftBumper().onTrue(runOnce(() -> SmartDashboard.putBoolean("speaker", true)));
     op.rightBumper().onTrue(runOnce(() -> SmartDashboard.putBoolean("speaker", false)));
+
+    // Change angle manually
+    op.leftTrigger().onTrue(arm.relativeAngleChange(-1.0));
+    op.rightTrigger().onTrue(arm.relativeAngleChange(1.0));
+
+    op.back().onTrue(shooter.relativeSpeedChange(-10.0));
+    op.start().onTrue(shooter.relativeSpeedChange(10.0));
 
     // TRIGGERS==================================================================
     // When a note is detected by the camera near the intake turn the lights green
@@ -216,7 +221,7 @@ public class RobotContainer {
     readyToShoot.onTrue(runOnce(() -> SmartDashboard.putBoolean("readyToShoot", true)));
     readyToShoot.onFalse(runOnce(() -> SmartDashboard.putBoolean("readyToShoot", false)));
 
-    // All of these bindings are for System Indentification and will be disabled at competition
+/*     // All of these bindings are for System Indentification and will be disabled at competition
     drv.leftTrigger().and(drv.pov(0)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kForward));
     drv.leftTrigger().and(drv.pov(180)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kReverse));
 
@@ -232,7 +237,7 @@ public class RobotContainer {
     op.back().whileTrue(arm.dynamicForward());
     op.start().whileTrue(arm.dynamicBackward());
     op.leftTrigger().whileTrue(arm.quasistaticForward());
-    op.rightTrigger().whileTrue(arm.quasistaticBackward());
+    op.rightTrigger().whileTrue(arm.quasistaticBackward()); */
 
     // Drivetrain needs to be placed against a sturdy wall and test stopped immediately upon wheel slip
     drv.back().and(drv.pov(0)).whileTrue(drivetrain.runDriveSlipTest());
@@ -257,7 +262,7 @@ public class RobotContainer {
     robo = new RoboticPathing();
     shooterCamera = new Limelight(drivetrain, "limelight-tag");
 
-    autoAim.HeadingController.setPID(2.0, 0.0, 0.5);
+    autoAim.HeadingController.setPID(3.0, 0.0, 0.5);
     autoAim.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
 
     //PPHolonomicDriveController.setRotationTargetOverride(Optional.of(getSpeakerRotation()));
@@ -424,14 +429,17 @@ public class RobotContainer {
 
   private Double getSpeakerDistance() {
     if (!blue) {
+      SmartDashboard.putNumber("SpeakerDistance", drivetrain.getState().Pose.getTranslation().getDistance(Constants.Field.redSpeaker));
       return drivetrain.getState().Pose.getTranslation().getDistance(Constants.Field.redSpeaker);
     } else {
-      return drivetrain.getState().Pose.getTranslation().getDistance(Constants.Field.redSpeaker);
+      SmartDashboard.putNumber("SpeakerDistance", drivetrain.getState().Pose.getTranslation().getDistance(Constants.Field.blueSpeaker));
+      return drivetrain.getState().Pose.getTranslation().getDistance(Constants.Field.blueSpeaker);
     }
   }
 
   private void autoAim() {
     Rotation2d speaker = getSpeakerRotation();
+    // The operator perspective stuff inverts everything field oriented
     if (blue) {
       speaker = speaker.plus(new Rotation2d(Math.PI));
     }
@@ -486,10 +494,12 @@ public class RobotContainer {
 
   public void createIntakeTrigger() {
     // Turn the intake off whenever the note gets to the sensor
-    intake.getIntakeSensor().onTrue(intake.intakeStop()
+    intake.getIntakeSlowSensor().onTrue(intake.intakeSlow()
         .alongWith(arm.setStorePosition())
-        .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true))));
-    intake.getIntakeSensor().onFalse(
+        .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true)))
+        .alongWith(intakeCamera.blinkLEDS())
+        .alongWith(shooterCamera.blinkLEDS()));
+    intake.getIntakeStopSensor().onFalse(
         new WaitCommand(0.2).andThen(shooter.setOffSpeed())
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", false))));
   }

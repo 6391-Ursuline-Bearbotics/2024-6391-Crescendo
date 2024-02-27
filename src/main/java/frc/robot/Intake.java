@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -17,12 +15,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Intake extends SubsystemBase {
   private static final int intakePrimaryID = 5;
-  private static final int intakeSensorPort = 0;
+  private static final int intakeSlowSensorPort = 0;
+  private static final int intakeStopSensorPort = 0;
   private CANSparkMax m_motor;
 
   private static final double intakeSpeed = 0.9;
-  private static final double intakeSlowSpeed = 0.2;
-  private DigitalInput noteSensor = new DigitalInput(intakeSensorPort);
+  private static final double intakeSlowSpeed = 0.2; // Minimum speed required to move the note
+  private DigitalInput noteSlowSensor = new DigitalInput(intakeSlowSensorPort);
+  private DigitalInput noteStopSensor = new DigitalInput(intakeStopSensorPort);
 
   /** Creates a new Arm. */
   public Intake() {
@@ -36,29 +36,35 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeOn() {
-    return this.runOnce(() -> m_motor.setVoltage(intakeSpeed * 12));
+    return runOnce(() -> m_motor.setVoltage(intakeSpeed * 12));
   }
 
   // This is a command for whatever process should take place after the first sensor is tripped
-  public Command intakeStop() {
-    return intakeOff();
+  public Command intakeSlow() {
+    return run(() -> m_motor.setVoltage(intakeSlowSpeed * 12)).until(() -> !noteStopSensor.get())
+        .withTimeout(2.5).andThen(intakeOff());
   }
 
-  // This starts the intake then stops it after 5 seconds or if a note is detected
+  // This starts the intake then stops it after 2.5 seconds or if a note is detected
   public Command intakeAutoStop() {
-    return this.run(() -> m_motor.setVoltage(intakeSpeed * 12)).until(() -> !noteSensor.get()).withTimeout(2.5).andThen(intakeStop());
+    return run(() -> m_motor.setVoltage(intakeSpeed * 12)).until(() -> !noteSlowSensor.get())
+        .andThen(intakeSlow());
   }
 
   public Command intakeOff() {
-    return this.runOnce(() -> m_motor.setVoltage(0));
+    return runOnce(() -> m_motor.setVoltage(0));
   }
 
   public Command shoot() {
-    return this.run(() -> m_motor.setVoltage(intakeSpeed * 12)).withTimeout(0.3)
-        .andThen(this.runOnce(() -> m_motor.set(0)));
+    return run(() -> m_motor.setVoltage(intakeSpeed * 12)).withTimeout(0.3)
+        .andThen(intakeOff());
   }
 
-  public Trigger getIntakeSensor() {
-    return new Trigger(() -> !noteSensor.get());
+  public Trigger getIntakeSlowSensor() {
+    return new Trigger(() -> !noteSlowSensor.get());
+  }
+
+  public Trigger getIntakeStopSensor() {
+    return new Trigger(() -> !noteStopSensor.get());
   }
 }

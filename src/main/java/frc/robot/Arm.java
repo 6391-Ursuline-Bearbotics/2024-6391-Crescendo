@@ -198,4 +198,8 @@ public class Arm extends SubsystemBase {
           return m_absoluteEncoder.getPosition() <= 0.05;
       });
   }
+
+  public Command relativeAngleChange(double degrees) {
+    return setArmGoalCommand(m_goal.position + (degrees / 120));
+  }
 }

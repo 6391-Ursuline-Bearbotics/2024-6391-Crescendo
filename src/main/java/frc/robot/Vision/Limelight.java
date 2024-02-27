@@ -4,10 +4,13 @@
 
 package frc.robot.Vision;
 
+import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -16,22 +19,20 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CommandSwerveDrivetrain;
 import frc.robot.Util.RectanglePoseArea;
 
 public class Limelight extends SubsystemBase {
   CommandSwerveDrivetrain drivetrain;
-  Alliance alliance;
-  private String ll = "limelight-tag";
+  private String ll = "limelight";
   private Boolean enable = false;
   private Boolean trust = false;
   private int fieldError = 0;
   private int distanceError = 0;
-  Double targetDistance;
-  private Pose2d botpose;
-  private static final RectanglePoseArea field =
-        new RectanglePoseArea(new Translation2d(0.0, 0.0), new Translation2d(16.54, 8.02));
+  private double confidence = 0;
+  private double compareDistance;
 
   private final NetworkTable table = NetworkTableInstance.getDefault().getTable("Pose");
   private final DoubleArrayPublisher limelightPub = table.getDoubleArrayTopic("llPose").publish();
@@ -41,66 +42,66 @@ public class Limelight extends SubsystemBase {
     this.drivetrain = drivetrain;
     this.ll = ll;
     LimelightHelpers.setPipelineIndex(ll, 0);
-    SmartDashboard.putNumber("Field Error", fieldError);
-    SmartDashboard.putNumber("Limelight Error", distanceError);
   }
 
   @Override
   public void periodic() {
     if ((enable || DriverStation.isDisabled()) && !RobotBase.isSimulation()) {
-/*       // Get the distance between the camera and the AprilTag, this will affect how much we trust the measurement
-      targetDistance = LimelightHelpers.getTargetPose3d_CameraSpace(ll).getTranslation().getDistance(new Translation3d());
-      // Tune this for your robot around how much variance you see in the pose at a given distance, higher = less trust
-      Double lackconfidence = ((targetDistance - 1) / 6);
-      LimelightHelpers.Results result =
-          LimelightHelpers.getLatestResults(ll).targetingResults;
-      if (result.valid) {
-        botpose = LimelightHelpers.getBotPose2d_wpiBlue(ll);
-        limelightPub.set(new double[] {
-          botpose.getX(),
-          botpose.getY(),
-          botpose.getRotation().getDegrees()
-        });
-        if (field.isPoseWithinArea(botpose)) {
-          int numberOfTargets = result.targets_Fiducials.length;
-          if (drivetrain.getState().Pose.getTranslation().getDistance(botpose.getTranslation()) < 0.5
-              || trust
-              || numberOfTargets > 1) {
-            drivetrain.addVisionMeasurement(
-                botpose,
-                Timer.getFPGATimestamp()
-                    - (result.latency_capture / 1000.0)
-                    - (result.latency_pipeline / 1000.0),
-                VecBuilder.fill(lackconfidence / numberOfTargets, lackconfidence / numberOfTargets, .99));
-          } else {
-            distanceError++;
-            SmartDashboard.putNumber("Limelight Error", distanceError);
-          }
-        } else {
-          fieldError++;
-          SmartDashboard.putNumber("Field Error", fieldError);
-        }
-      } */
+      // How to test:
+      // Odometry is good on a nice flat surface so when testing on flat assume odometry as ground truth
+      // Log over the last 5? seconds what has been the avg distance between odometry and the LL pose
 
+
+      // Things to consider testing / excluding:
+      // When spining past some rate we get bad results
+      // Anything past 15ft seems to have too much variance
+      // 
+
+      confidence = 0; // If we don't update confidence then we don't send the measurement
       LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(ll);
       SmartDashboard.putNumber("NumTags", limelightMeasurement.tagCount);
-      if(limelightMeasurement.tagCount >= 2)
-      {
-        limelightPub.set(new double[] {
-          limelightMeasurement.pose.getX(),
-          limelightMeasurement.pose.getY(),
-          limelightMeasurement.pose.getRotation().getDegrees()
-        });
-        drivetrain.addVisionMeasurement(
-            limelightMeasurement.pose,
-            limelightMeasurement.timestampSeconds,
-            VecBuilder.fill(.7,.7,99));
+      // We are publishing this to view as a ghost to try and help determine when not to use the LL measurements
+      publishToField(limelightMeasurement);
+
+      // No tag found so check no further
+      if(limelightMeasurement.tagCount >= 1) {
+        // Excluding different measurements that are absolute showstoppers even with full trust 
+        if(limelightMeasurement.avgTagDist < Units.feetToMeters(15) && drivetrain.getState().speeds.omegaRadiansPerSecond < Math.PI) {
+          // Reasons to blindly trust as much as odometry
+          if (trust || DriverStation.isDisabled() || 
+              (limelightMeasurement.tagCount >= 2 && limelightMeasurement.avgTagDist < Units.feetToMeters(10))) {
+                confidence = 0.1;
+          } else {
+            compareDistance = limelightMeasurement.pose.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
+            if( compareDistance < 0.5) {
+
+            }
+          }
+        }
       }
+      addPose(limelightMeasurement, confidence);
     }
   }
 
-  public void setAlliance(Alliance alliance) {
-    this.alliance = alliance;
+  private void addPose(LimelightHelpers.PoseEstimate limelightMeasurement, double confide) {
+    if(confide > 0) {
+      SmartDashboard.putBoolean("PoseUpdate", true);
+      drivetrain.addVisionMeasurement(
+          limelightMeasurement.pose,
+          limelightMeasurement.timestampSeconds,
+          VecBuilder.fill(confide, confide, Double.MAX_VALUE));
+    } else {
+      SmartDashboard.putBoolean("PoseUpdate", false);
+    }
+  }
+
+  private void publishToField(LimelightHelpers.PoseEstimate limelightMeasurement) {
+    // If you have a Field2D you can easily push it that way here.
+    limelightPub.set(new double[] {
+      limelightMeasurement.pose.getX(),
+      limelightMeasurement.pose.getY(),
+      limelightMeasurement.pose.getRotation().getDegrees()
+    });
   }
 
   public void useLimelight(boolean enable) {
@@ -109,5 +110,11 @@ public class Limelight extends SubsystemBase {
 
   public void trustLL(boolean trust) {
     this.trust = trust;
+  }
+
+  public Command blinkLEDS() {
+    return runOnce(() -> LimelightHelpers.setLEDMode_ForceBlink(ll))
+        .andThen(waitSeconds(2))
+        .andThen(() -> LimelightHelpers.setLEDMode_ForceOff(ll));
   }
 }

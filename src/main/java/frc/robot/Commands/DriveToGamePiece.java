@@ -27,12 +27,12 @@ public class DriveToGamePiece extends Command {
     this.ll = ll;
   }
   private final SwerveRequest.RobotCentric drive = new SwerveRequest.RobotCentric()
-    .withDeadband(TunerConstants.kSpeedAt12VoltsMps * 0.01).withRotationalDeadband(Constants.Drive.MaxAngularRate * 0.01)
+    //.withDeadband(TunerConstants.kSpeedAt12VoltsMps * 0.01).withRotationalDeadband(Constants.Drive.MaxAngularRate * 0.01)
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
   private double thetaOutput = 0;
   private final double xOutput = 0.2; // Speed to drive towards note will increase after testing
   private final double yOutput = 0;
-  private double setpoint = 0; // How far the camera is offset from the center in degrees
+  private double setpoint = 0;
 
   // Called when the command is initially scheduled.
   @Override

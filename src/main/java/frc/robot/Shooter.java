@@ -58,22 +58,22 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command setAutoSpeed() {
-    return this.runOnce(() -> setRPS(100));
+    return runOnce(() -> setRPS(100));
   }
 
   public Command setWingSpeed() {
-    return this.runOnce(() -> setRPS(300));
+    return runOnce(() -> setRPS(300));
   }
 
   public Command setAmpSpeed() {
-    return this.runOnce(() -> setRPS(30));
+    return runOnce(() -> setRPS(30));
   }
 
   public Command setOffSpeed() {
-    return this.runOnce(() -> setRPS(0));
+    return runOnce(() -> setRPS(0));
   }
 
-  public void relativeSpeedChange(double changeAmount) {
-    m_shooterMotor.setControl(m_velocity.withVelocity(m_shooterMotor.getVelocity().getValue() + changeAmount));
+  public Command relativeSpeedChange(double changeAmount) {
+    return runOnce(() -> m_shooterMotor.setControl(m_velocity.withVelocity(m_shooterMotor.getVelocity().getValue() + changeAmount)));
   }
 }
