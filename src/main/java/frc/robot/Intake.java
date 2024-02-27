@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Intake extends SubsystemBase {
   private static final int intakePrimaryID = 5;
-  private static final int intakeSlowSensorPort = 0;
-  private static final int intakeStopSensorPort = 1;
+  private static final int intakeSlowSensorPort = 1;
+  private static final int intakeStopSensorPort = 0;
   private CANSparkMax m_motor;
 
   private static final double intakeSpeed = 0.9;
@@ -47,8 +47,8 @@ public class Intake extends SubsystemBase {
 
   // This starts the intake then stops it after 2.5 seconds or if a note is detected
   public Command intakeAutoStop() {
-    return run(() -> m_motor.setVoltage(intakeSpeed * 12)).until(() -> !noteSlowSensor.get())
-        .andThen(intakeSlow());
+    return run(() -> m_motor.setVoltage(intakeSpeed * 12)).until(() -> !noteStopSensor.get())
+        .andThen(intakeOff());
   }
 
   public Command intakeOff() {
