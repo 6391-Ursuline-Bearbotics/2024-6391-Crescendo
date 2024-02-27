@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Util.InterpolatingTable;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -37,9 +38,6 @@ public class Arm extends SubsystemBase {
 
   // Arm setpoints in degrees
   private static final double intakePosition = 0.0;
-  private static final double subwooferPosition = 8.0;
-  private static final double autoPosition = 28.0;
-  private static final double wingPosition = 41.5;
   private static final double storePosition = 45.0;
   private static final double ampPosition = 90.0;
 
@@ -136,15 +134,15 @@ public class Arm extends SubsystemBase {
   }
 
   public Command setWingShootPosition() {
-    return setArmGoalCommand(wingPosition);
+    return setArmGoalCommand(InterpolatingTable.wing.angle);
   }
 
   public Command setAutoShootPosition() {
-    return setArmGoalCommand(autoPosition);
+    return setArmGoalCommand(InterpolatingTable.auto.angle);
   }
 
   public Command setSubShootPosition() {
-    return setArmGoalCommand(subwooferPosition);
+    return setArmGoalCommand(InterpolatingTable.sub.angle);
   }
 
   public Command setAmpPosition() {

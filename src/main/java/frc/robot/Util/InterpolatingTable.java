@@ -10,6 +10,9 @@ import static java.util.Map.entry;
 
 // Interpolating table
 public class InterpolatingTable {
+    public static final ShotParameter sub = new ShotParameter(8.0, 100); // 37.991 along ground
+    public static final ShotParameter auto = new ShotParameter(28.0, 100); // 120.732 along ground
+    public static final ShotParameter wing = new ShotParameter(41.5, 300); // 229.263 along ground
 
     /* Private constructor because this is a utility class */
     private InterpolatingTable() {}
@@ -17,9 +20,9 @@ public class InterpolatingTable {
     // Interpolating tree map
     private static final TreeMap<Double, ShotParameter> map = new TreeMap<>(
         Map.ofEntries( // using pythag with 33" vertical distance between camera and speaker tag
-            entry(Units.inchesToMeters(50.32), new ShotParameter(7.0, 100)), // 37.991 along ground
-            entry(Units.inchesToMeters(125.16), new ShotParameter(22.0, 100)), // 120.732 along ground
-            entry(Units.inchesToMeters(231.63), new ShotParameter(40.0, 300)) // 229.263 along ground
+            entry(Units.inchesToMeters(50.32), sub),
+            entry(Units.inchesToMeters(125.16), auto),
+            entry(Units.inchesToMeters(231.63), wing)
         )
     );
 

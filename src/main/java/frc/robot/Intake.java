@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class Intake extends SubsystemBase {
   private static final int intakePrimaryID = 5;
   private static final int intakeSlowSensorPort = 0;
-  private static final int intakeStopSensorPort = 0;
+  private static final int intakeStopSensorPort = 1;
   private CANSparkMax m_motor;
 
   private static final double intakeSpeed = 0.9;

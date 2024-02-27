@@ -7,8 +7,10 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Util.InterpolatingTable;
 
 public class Shooter extends SubsystemBase {
 
@@ -31,6 +33,11 @@ public class Shooter extends SubsystemBase {
     m_shooterMotor2.getConfigurator().apply(flywheelTalonConfig);
 
     m_shooterMotor2.setControl(new Follower(3, false));
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("ShooterSetpoint", m_shooterMotor.getClosedLoopReference().getValueAsDouble());
   }
 
   public double getShooterSpeed() {
@@ -57,12 +64,16 @@ public class Shooter extends SubsystemBase {
     m_shooterMotor.setControl(m_velocity.withVelocity(rps));
   }
 
+  public Command setSubSpeed() {
+    return runOnce(() -> setRPS(InterpolatingTable.sub.rps));
+  }
+
   public Command setAutoSpeed() {
-    return runOnce(() -> setRPS(100));
+    return runOnce(() -> setRPS(InterpolatingTable.auto.rps));
   }
 
   public Command setWingSpeed() {
-    return runOnce(() -> setRPS(300));
+    return runOnce(() -> setRPS(InterpolatingTable.wing.rps));
   }
 
   public Command setAmpSpeed() {

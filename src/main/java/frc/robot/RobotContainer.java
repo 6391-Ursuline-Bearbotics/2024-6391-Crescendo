@@ -184,7 +184,7 @@ public class RobotContainer {
 
     // Shoot from the Subwoofer
     op.povDown().onTrue(arm.setSubShootPosition()
-        .alongWith(shooter.setAutoSpeed())
+        .alongWith(shooter.setSubSpeed())
         .alongWith(intake.intakeOff()));
 
     // Shoot from Interpolated Spot
