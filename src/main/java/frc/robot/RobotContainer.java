@@ -98,6 +98,7 @@ public class RobotContainer {
   private Translation2d speaker;
   private boolean blue = false;
   private boolean turtle = false;
+  private ShotParameter shot;
 
   private void configureBindings() {
     newControlStyle();
@@ -105,7 +106,6 @@ public class RobotContainer {
 
     // Set up Driver Controls ================================================
     // Does full automation while held on the Amp side of the field
-    drv.x().whileTrue(getChoice(true, blue));
     drv.x().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // Does full automation while held though the middle of the field
@@ -116,7 +116,6 @@ public class RobotContainer {
     drv.y().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // Does full automation while held on the Source side of the field
-    drv.b().whileTrue(getChoice(false, blue));
     drv.b().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // While held will stay aimed at the speaker driver still has translation control but not rotation
@@ -370,16 +369,20 @@ public class RobotContainer {
   }
 
   private Command distanceShot(Supplier<Double> distance) {
-    ShotParameter shot = InterpolatingTable.get(distance.get());
-    return shooter.runOnce(() -> shooter.setRPS(shot.rps))
-      .alongWith(arm.runOnce(() -> arm.setGoal(shot.angle)));
+    return runOnce(() -> shot = InterpolatingTable.get(distance.get()))
+        .andThen(shooter.runOnce(() -> shooter.setRPS(shot.rps))
+            .alongWith(arm.runOnce(() -> arm.setGoal(shot.angle))));
   }
 
   public void colorReceived(Alliance ally) {
     if (ally == Alliance.Blue) {
       blue = true;
+      drv.x().whileTrue(topRoboticRoutine);
+      drv.b().whileTrue(botRoboticRoutine);
     } else {
       blue = false;
+      drv.x().whileTrue(botRoboticRoutine);
+      drv.b().whileTrue(topRoboticRoutine);
     }
     if (Utils.isSimulation()) {
       if (ally == Alliance.Blue) {
@@ -480,15 +483,6 @@ public class RobotContainer {
           }
         }
       }
-    }
-  }
-
-  private Command getChoice(Boolean xButton, Boolean blueAlly) {
-    // Run top if blue left button(x) or red right button(b)
-    if ((blueAlly && xButton) || (!blueAlly && !xButton)) {
-      return topRoboticRoutine;
-    } else {
-      return botRoboticRoutine;
     }
   }
 

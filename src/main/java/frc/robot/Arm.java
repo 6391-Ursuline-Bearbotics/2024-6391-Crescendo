@@ -198,6 +198,6 @@ public class Arm extends SubsystemBase {
   }
 
   public Command relativeAngleChange(double degrees) {
-    return setArmGoalCommand(m_goal.position + (degrees / 120));
+    return runOnce(() -> setGoal((m_goal.position * 120) + degrees));
   }
 }

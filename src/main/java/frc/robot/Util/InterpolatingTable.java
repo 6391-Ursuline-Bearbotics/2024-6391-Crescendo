@@ -22,7 +22,7 @@ public class InterpolatingTable {
         Map.ofEntries( // using pythag with 33" vertical distance between camera and speaker tag
             entry(Units.inchesToMeters(50.32), sub),
             entry(Units.inchesToMeters(125.16), auto),
-            entry(Units.inchesToMeters(231.63), wing)
+            entry(Units.inchesToMeters(165.00), wing)
         )
     );
 

@@ -85,6 +85,6 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command relativeSpeedChange(double changeAmount) {
-    return runOnce(() -> m_shooterMotor.setControl(m_velocity.withVelocity(m_shooterMotor.getVelocity().getValue() + changeAmount)));
+    return runOnce(() -> m_shooterMotor.setControl(m_velocity.withVelocity(m_shooterMotor.getClosedLoopReference().getValue() + changeAmount)));
   }
 }

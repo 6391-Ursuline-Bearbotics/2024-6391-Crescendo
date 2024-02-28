@@ -79,9 +79,6 @@ public class Robot extends TimedRobot {
     stopAll();
     m_robotContainer.createIntakeTrigger();
 
-    // Sets the driver perspective to forward for Red Side
-    m_robotContainer.drivetrain.setOperatorPerspectiveForward(Rotation2d.fromDegrees(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? 0 : 180));
-
     // Allows the simulation sensor to work on the proper side of the field
     m_robotContainer.colorReceived(DriverStation.getAlliance().orElse(Alliance.Blue));
 
