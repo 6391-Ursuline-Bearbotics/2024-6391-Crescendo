@@ -130,7 +130,8 @@ public class RobotContainer {
     drv.povLeft().onTrue(runOnce(() -> SmartDashboard.putBoolean("speaker", false)));
     
     // reset the field-centric heading on start button press
-    drv.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+    drv.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative(
+        new Pose2d(drivetrain.getState().Pose.getTranslation(), drivetrain.getOperatorPerspective()))));
 
     // Drives to the game piece using turn, it will not strafe
     drv.back().whileTrue(new DriveToGamePiece(drivetrain, intakeCamera));

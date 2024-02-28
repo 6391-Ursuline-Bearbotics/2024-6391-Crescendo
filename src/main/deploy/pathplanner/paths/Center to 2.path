@@ -36,8 +36,8 @@
         "y": 5.513288844759509
       },
       "prevControl": {
-        "x": 2.79,
-        "y": 5.513288844759509
+        "x": 2.8100684079450238,
+        "y": 5.510600915587749
       },
       "nextControl": null,
       "isLocked": false,
@@ -82,12 +82,6 @@
               "data": {
                 "name": "armSubShootPosition"
               }
-            },
-            {
-              "type": "wait",
-              "data": {
-                "waitTime": 0.02
-              }
             }
           ]
         }
@@ -113,7 +107,7 @@
   ],
   "globalConstraints": {
     "maxVelocity": 3.0,
-    "maxAcceleration": 2.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },

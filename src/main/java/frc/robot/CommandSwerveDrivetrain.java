@@ -187,6 +187,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         return m_slipSysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward);
     }
 
+    public Rotation2d getOperatorPerspective() {
+        return m_operatorForwardDirection;
+    }
+
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
 

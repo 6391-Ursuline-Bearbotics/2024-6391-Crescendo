@@ -8,6 +8,8 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.CommandSwerveDrivetrain;
@@ -33,6 +35,8 @@ public class DriveToGamePiece extends Command {
   private final double xOutput = 0.2; // Speed to drive towards note will increase after testing
   private final double yOutput = 0;
   private double setpoint = 0;
+  private double distance = 0;
+  private Timer distanceTimer = new Timer();
 
   // Called when the command is initially scheduled.
   @Override
@@ -44,7 +48,10 @@ public class DriveToGamePiece extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-		if (ll.hasTarget()){
+		if (ll.hasTarget()){ // || distanceTimer.hasElapsed(convertVertToTime(ll.getNoteVertical()))
+      if (distance == 0) {
+        distance = ll.getNoteVertical(); // This is the initial distance, we may want to do special cases here
+      }
       setpoint = Math.toRadians(-ll.getNoteHorizontal())+ drivetrain.getState().Pose.getRotation().getRadians();
       SmartDashboard.putNumber("Game Piece setpoint", setpoint);
 			thetaController.setSetpoint(setpoint);
@@ -67,5 +74,9 @@ public class DriveToGamePiece extends Command {
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  private Pose2d getNotePose(double distance, double yaw) {
+    return new Pose2d(null, null, null);
   }
 }
