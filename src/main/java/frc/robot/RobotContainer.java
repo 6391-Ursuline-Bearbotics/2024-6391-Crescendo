@@ -188,7 +188,7 @@ public class RobotContainer {
         .alongWith(intake.intakeOff()));
 
     // Shoot from Interpolated Spot
-    op.povRight().whileTrue(distanceShot(getSpeakerDistance()).repeatedly()
+    op.povRight().whileTrue(distanceShot(() -> getSpeakerDistance()).repeatedly()
         .alongWith(intake.intakeOff()));
 
     // Controls if the Robotic Pathing will drive to the speaker or amp
@@ -369,8 +369,8 @@ public class RobotContainer {
     return rotLimiter.calculate(MathUtil.applyDeadband(joystick, 0.05));
   }
 
-  private Command distanceShot(double distance) {
-    ShotParameter shot = InterpolatingTable.get(distance);
+  private Command distanceShot(Supplier<Double> distance) {
+    ShotParameter shot = InterpolatingTable.get(distance.get());
     return shooter.runOnce(() -> shooter.setRPS(shot.rps))
       .alongWith(arm.runOnce(() -> arm.setGoal(shot.angle)));
   }

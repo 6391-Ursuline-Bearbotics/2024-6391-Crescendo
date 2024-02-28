@@ -1,5 +1,8 @@
 {
   "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
     "retained": {
       "SmartDashboard": {
         "open": true

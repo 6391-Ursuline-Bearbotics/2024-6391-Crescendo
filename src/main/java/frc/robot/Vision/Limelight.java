@@ -27,7 +27,7 @@ import frc.robot.Util.RectanglePoseArea;
 public class Limelight extends SubsystemBase {
   CommandSwerveDrivetrain drivetrain;
   private String ll = "limelight";
-  private Boolean enable = false;
+  private Boolean enable = true;
   private Boolean trust = false;
   private int fieldError = 0;
   private int distanceError = 0;
@@ -46,7 +46,7 @@ public class Limelight extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if ((enable || DriverStation.isDisabled()) && !RobotBase.isSimulation()) {
+    if ((enable || DriverStation.isDisabled()) && !RobotBase.isSimulation() && !DriverStation.isAutonomous()) {
       // How to test:
       // Odometry is good on a nice flat surface so when testing on flat assume odometry as ground truth
       // Log over the last 5? seconds what has been the avg distance between odometry and the LL pose
