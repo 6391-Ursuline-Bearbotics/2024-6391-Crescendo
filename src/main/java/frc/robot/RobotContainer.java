@@ -240,7 +240,7 @@ public class RobotContainer {
     op.rightTrigger().whileTrue(arm.quasistaticBackward()); */
 
     // Drivetrain needs to be placed against a sturdy wall and test stopped immediately upon wheel slip
-    drv.back().and(drv.pov(0)).whileTrue(drivetrain.runDriveSlipTest());
+    //drv.back().and(drv.pov(0)).whileTrue(drivetrain.runDriveSlipTest());
   }
 
   public RobotContainer() {

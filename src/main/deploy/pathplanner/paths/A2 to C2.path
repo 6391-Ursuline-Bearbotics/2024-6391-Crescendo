@@ -1,0 +1,132 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.4694120229027585,
+        "y": 5.595244965087426
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.911908005634193,
+        "y": 6.586094626734709
+      },
+      "isLocked": false,
+      "linkedName": "2 Shoot"
+    },
+    {
+      "anchor": {
+        "x": 8.093010367838918,
+        "y": 5.895767427898492
+      },
+      "prevControl": {
+        "x": 6.866704835670331,
+        "y": 6.416234310737486
+      },
+      "nextControl": {
+        "x": 9.697554667836608,
+        "y": 5.214768974992495
+      },
+      "isLocked": false,
+      "linkedName": "C2"
+    },
+    {
+      "anchor": {
+        "x": 2.4694120229027585,
+        "y": 5.595244965087426
+      },
+      "prevControl": {
+        "x": 5.863440090516545,
+        "y": 2.9198974761585887
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "2 Shoot"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": -23.198590513648206,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0.65,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "armIntakePosition"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "intakeOn"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 2.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "shoot"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Arm to Shoot",
+      "waypointRelativePos": 1.3,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "armAutoShootPosition"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 0.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

@@ -1,0 +1,105 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.4694120229027585,
+        "y": 5.595244965087426
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.346502874823931,
+        "y": 6.268917265107257
+      },
+      "isLocked": false,
+      "linkedName": "2 Shoot"
+    },
+    {
+      "anchor": {
+        "x": 2.710323966102478,
+        "y": 6.921929480222596
+      },
+      "prevControl": {
+        "x": 2.047983005056919,
+        "y": 6.56743713487427
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "1 Shoot"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "armIntakePosition"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "intakeOn"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 1.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "armAutoShootPosition"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 0.4
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "shoot"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 35.27242144859854,
+    "rotateFast": true
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 0.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}
