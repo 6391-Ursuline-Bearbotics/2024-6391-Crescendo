@@ -59,35 +59,6 @@
           ]
         }
       }
-    },
-    {
-      "name": "After Intake",
-      "waypointRelativePos": 1.0,
-      "command": {
-        "type": "sequential",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "armAutoShootPosition"
-              }
-            },
-            {
-              "type": "wait",
-              "data": {
-                "waitTime": 0.4
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "shoot"
-              }
-            }
-          ]
-        }
-      }
     }
   ],
   "globalConstraints": {

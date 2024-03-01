@@ -35,30 +35,7 @@
       "name": "Intake",
       "waypointRelativePos": 0,
       "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "armIntakePosition"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "intakeOn"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 1.0,
-      "command": {
-        "type": "parallel",
+        "type": "sequential",
         "data": {
           "commands": [
             {
@@ -77,6 +54,18 @@
               "type": "named",
               "data": {
                 "name": "shoot"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "armIntakePosition"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "intakeOn"
               }
             }
           ]
