@@ -37,7 +37,7 @@ public class Arm extends SubsystemBase {
   private SysIdRoutine sysIdRoutine;
 
   // Arm setpoints in degrees
-  private static final double intakePosition = 0.0;
+  private static final double intakePosition = -2;
   private static final double storePosition = 45.0;
   private static final double ampPosition = 90.0;
 
@@ -77,7 +77,7 @@ public class Arm extends SubsystemBase {
     m_pidController = m_motor.getPIDController();
     m_pidController.setP(2);
     m_pidController.setI(0);
-    m_pidController.setD(0);
+    m_pidController.setD(.15);
     m_pidController.setIZone(0);
     m_pidController.setFF(0);
     m_pidController.setOutputRange(-0.2, 0.2);
@@ -93,7 +93,7 @@ public class Arm extends SubsystemBase {
                         null, // No log consumer, since data is recorded by URCL
                         this));
 
-    m_armFF = new ArmFeedforward(0, 0.96, 0);
+    m_armFF = new ArmFeedforward(0, 1.4, 0);
 
     m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
         kMaxVelocityRadPerSecond, kMaxAccelerationRadPerSecSquared));

@@ -12,8 +12,8 @@ import static java.util.Map.entry;
 public class InterpolatingTable {
     public static final ShotParameter sub = new ShotParameter(8.0, 100);
     public static final ShotParameter auto = new ShotParameter(28.0, 125);
-    public static final ShotParameter stage = new ShotParameter(41.5, 200);
-    public static final ShotParameter wing = new ShotParameter(47.6, 220);
+    public static final ShotParameter stage = new ShotParameter(42.8, 200);
+    public static final ShotParameter wing = new ShotParameter(48.2, 220);
 
     /* Private constructor because this is a utility class */
     private InterpolatingTable() {}
