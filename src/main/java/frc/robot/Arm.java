@@ -32,7 +32,7 @@ public class Arm extends SubsystemBase {
   private RelativeEncoder m_relativeEncoder;
   private SparkAbsoluteEncoder m_absoluteEncoder;
   private ArmFeedforward m_armFF;
-  private Boolean disabled = false;
+  private Boolean disabled = true;
   private Double position = 0.0;
   private SysIdRoutine sysIdRoutine;
 
