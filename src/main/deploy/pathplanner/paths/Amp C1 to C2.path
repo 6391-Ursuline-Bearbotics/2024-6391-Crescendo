@@ -3,51 +3,56 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.74,
-        "y": 4.52
+        "x": 3.7,
+        "y": 6.3589004458829015
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2050697410876046,
-        "y": 1.8063389257368858
+        "x": 6.008661462758568,
+        "y": 6.050501117108326
       },
       "isLocked": false,
-      "linkedName": "SourceStart"
+      "linkedName": "Amp Stage Shot"
     },
     {
       "anchor": {
-        "x": 8.009051654466946,
-        "y": 4.113976955226638
+        "x": 8.27025654051308,
+        "y": 5.774493730805644
       },
       "prevControl": {
-        "x": 6.258318062253299,
-        "y": 4.288219238334721
+        "x": 6.5381804401587535,
+        "y": 5.981394968803318
       },
       "nextControl": {
-        "x": 8.612510543715882,
-        "y": 4.053917529228162
+        "x": 8.872415904989046,
+        "y": 5.702564144134202
       },
       "isLocked": false,
-      "linkedName": "C3"
+      "linkedName": "C2"
     },
     {
       "anchor": {
-        "x": 3.792458494007897,
-        "y": 4.944235343016141
+        "x": 3.7,
+        "y": 6.3589004458829015
       },
       "prevControl": {
-        "x": 5.4799768991309,
-        "y": 4.170733779750208
+        "x": 5.685576451653799,
+        "y": 6.0798724817485414
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "SourceShoot"
+      "linkedName": "Amp Stage Shot"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.55,
-      "rotationDegrees": 8.684037211909187,
+      "waypointRelativePos": 0.35,
+      "rotationDegrees": 0.0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1.1,
+      "rotationDegrees": -3.0,
       "rotateFast": false
     }
   ],
@@ -125,13 +130,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -5.572197803963805,
+    "rotation": 15.068488159492224,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": -60.0,
+    "rotation": 15.07,
     "velocity": 0.0
   },
   "useDefaultConstraints": false
