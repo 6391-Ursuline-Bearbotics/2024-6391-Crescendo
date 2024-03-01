@@ -36,15 +36,33 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "armAutoAndShoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "A3 to A2"
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "armAutoAndShoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "A2 to A1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armAutoAndShoot"
           }
         },
         {

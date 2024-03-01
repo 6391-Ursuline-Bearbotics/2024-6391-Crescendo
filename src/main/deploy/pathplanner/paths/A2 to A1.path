@@ -41,24 +41,6 @@
             {
               "type": "named",
               "data": {
-                "name": "armAutoShootPosition"
-              }
-            },
-            {
-              "type": "wait",
-              "data": {
-                "waitTime": 0.4
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "shoot"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
                 "name": "armIntakePosition"
               }
             },

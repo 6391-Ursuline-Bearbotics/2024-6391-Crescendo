@@ -95,23 +95,11 @@
     },
     {
       "name": "Shoot",
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 2.0,
       "command": {
-        "type": "sequential",
+        "type": "parallel",
         "data": {
           "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "armAutoShootPosition"
-              }
-            },
-            {
-              "type": "wait",
-              "data": {
-                "waitTime": 0.4
-              }
-            },
             {
               "type": "named",
               "data": {

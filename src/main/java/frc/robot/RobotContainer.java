@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.either;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
 import java.util.function.Supplier;
 
@@ -261,6 +262,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("armSubShootPosition", arm.setSubShootPosition());
     NamedCommands.registerCommand("armAmpPosition", arm.setAmpPosition());
     NamedCommands.registerCommand("intakeOn", intake.intakeAutoStop());
+    NamedCommands.registerCommand("armAutoAndShoot", armAutoAndShoot());
 
     drivetrain = TunerConstants.DriveTrain; // Make Drivetrain after Named Commands
     robo = new RoboticPathing();
@@ -507,5 +509,11 @@ public class RobotContainer {
     intake.getIntakeStopSensor().onFalse(
         new WaitCommand(0.2).andThen(shooter.setOffSpeed())
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", false))));
+  }
+
+  private Command armAutoAndShoot() {
+    return arm.setAutoShootPosition()
+        .andThen(waitSeconds(0.4))
+        .andThen(intake.shoot());
   }
 }
