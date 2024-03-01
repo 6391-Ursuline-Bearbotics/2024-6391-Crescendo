@@ -23,7 +23,7 @@ public class InterpolatingTable {
         Map.ofEntries(
             entry(1.135, sub),
             entry(2.18, auto),
-            entry(3.57, stage),
+            entry(3.61, stage),
             entry(6.17, wing)
         )
     );
