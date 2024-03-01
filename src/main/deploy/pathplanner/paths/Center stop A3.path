@@ -49,6 +49,12 @@
               "data": {
                 "name": "intakeOn"
               }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "shooterAutoSpeed"
+              }
             }
           ]
         }
@@ -64,7 +70,7 @@
             {
               "type": "named",
               "data": {
-                "name": "armSubShootPosition"
+                "name": "armAutoShootPosition"
               }
             },
             {

@@ -99,6 +99,7 @@ public class RobotContainer {
   private boolean blue = false;
   private boolean turtle = false;
   private ShotParameter shot;
+  private double dist;
 
   private void configureBindings() {
     newControlStyle();
@@ -188,7 +189,7 @@ public class RobotContainer {
         .alongWith(intake.intakeOff()));
 
     // Shoot from Interpolated Spot
-    op.povRight().whileTrue(distanceShot(() -> getSpeakerDistance()).repeatedly()
+    op.povRight().whileTrue(distanceShot().repeatedly()
         .alongWith(intake.intakeOff()));
 
     // Controls if the Robotic Pathing will drive to the speaker or amp
@@ -249,10 +250,13 @@ public class RobotContainer {
 
     // Create PathPlanner Named Commands for use in Autos
     NamedCommands.registerCommand("shooterAutoSpeed", shooter.setAutoSpeed());
+    NamedCommands.registerCommand("shooterSubSpeed", shooter.setSubSpeed());
+    NamedCommands.registerCommand("shooterStageSpeed", shooter.setStageSpeed());
     NamedCommands.registerCommand("shooterAmpSpeed", shooter.setAmpSpeed());
     NamedCommands.registerCommand("shooterOffSpeed", shooter.setOffSpeed());
     NamedCommands.registerCommand("shoot", intake.shoot());
     NamedCommands.registerCommand("armIntakePosition", arm.setIntakePosition());
+    NamedCommands.registerCommand("armStageShootPosition", arm.setStageShootPosition());
     NamedCommands.registerCommand("armAutoShootPosition", arm.setAutoShootPosition());
     NamedCommands.registerCommand("armSubShootPosition", arm.setSubShootPosition());
     NamedCommands.registerCommand("armAmpPosition", arm.setAmpPosition());
@@ -369,10 +373,13 @@ public class RobotContainer {
     return rotLimiter.calculate(MathUtil.applyDeadband(joystick, 0.05));
   }
 
-  private Command distanceShot(Supplier<Double> distance) {
-    return runOnce(() -> shot = InterpolatingTable.get(distance.get()))
+  private Command distanceShot() {
+    return runOnce(() -> dist = SmartDashboard.getNumber("SpeakerDistance", 0))
+        .andThen(runOnce(() -> shot = InterpolatingTable.get(dist)))
         .andThen(shooter.runOnce(() -> shooter.setRPS(shot.rps))
-            .alongWith(arm.runOnce(() -> arm.setGoal(shot.angle))));
+            .unless(() -> dist <= 0 || dist > 16.541)
+            .alongWith(arm.runOnce(() -> arm.setGoal(shot.angle)))
+            .unless(() -> dist <= 0 || dist > 16.541));
   }
 
   public void colorReceived(Alliance ally) {
@@ -431,13 +438,15 @@ public class RobotContainer {
     return setpoint;
   }
 
-  private Double getSpeakerDistance() {
+  public Double getSpeakerDistance() {
     if (!blue) {
-      SmartDashboard.putNumber("SpeakerDistance", drivetrain.getState().Pose.getTranslation().getDistance(Constants.Field.redSpeaker));
-      return drivetrain.getState().Pose.getTranslation().getDistance(Constants.Field.redSpeaker);
+      double dist = drivetrain.getState().Pose.getTranslation().getDistance(Constants.Field.redSpeaker);
+      SmartDashboard.putNumber("SpeakerDistance", dist);
+      return dist;
     } else {
-      SmartDashboard.putNumber("SpeakerDistance", drivetrain.getState().Pose.getTranslation().getDistance(Constants.Field.blueSpeaker));
-      return drivetrain.getState().Pose.getTranslation().getDistance(Constants.Field.blueSpeaker);
+      double dist = drivetrain.getState().Pose.getTranslation().getDistance(Constants.Field.blueSpeaker);
+      SmartDashboard.putNumber("SpeakerDistance", dist);
+      return dist;
     }
   }
 
@@ -489,9 +498,10 @@ public class RobotContainer {
 
   public void createIntakeTrigger() {
     // Turn the intake off whenever the note gets to the sensor
+    intake.getIntakeStopSensor().onTrue(intake.intakeOff()
+        .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true))));
     intake.getIntakeSlowSensor().onTrue(intake.intakeSlow()
         .alongWith(arm.setStorePosition())
-        .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true)))
         .alongWith(intakeCamera.blinkLEDS())
         .alongWith(shooterCamera.blinkLEDS()));
     intake.getIntakeStopSensor().onFalse(

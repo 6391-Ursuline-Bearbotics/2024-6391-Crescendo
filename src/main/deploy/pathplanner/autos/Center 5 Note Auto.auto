@@ -8,13 +8,13 @@
         {
           "type": "named",
           "data": {
-            "name": "shooterAutoSpeed"
+            "name": "shooterSubSpeed"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "armAutoShootPosition"
+            "name": "armSubShootPosition"
           }
         },
         {
@@ -32,13 +32,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Source to C3"
+            "pathName": "Center stop A3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SourceShoot to C4"
+            "pathName": "A3 to A2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "A2 to A1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "A1 to C1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "A2 to C2"
           }
         }
       ]

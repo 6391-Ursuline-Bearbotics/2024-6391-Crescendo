@@ -86,7 +86,13 @@
             {
               "type": "named",
               "data": {
-                "name": "armSubShootPosition"
+                "name": "armStageShootPosition"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "shooterStageSpeed"
               }
             }
           ]

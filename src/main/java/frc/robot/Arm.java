@@ -32,7 +32,7 @@ public class Arm extends SubsystemBase {
   private RelativeEncoder m_relativeEncoder;
   private SparkAbsoluteEncoder m_absoluteEncoder;
   private ArmFeedforward m_armFF;
-  private Boolean disabled = true;
+  private Boolean disabled = false;
   private Double position = 0.0;
   private SysIdRoutine sysIdRoutine;
 
@@ -135,6 +135,10 @@ public class Arm extends SubsystemBase {
 
   public Command setWingShootPosition() {
     return setArmGoalCommand(InterpolatingTable.wing.angle);
+  }
+
+  public Command setStageShootPosition() {
+    return setArmGoalCommand(InterpolatingTable.stage.angle);
   }
 
   public Command setAutoShootPosition() {
