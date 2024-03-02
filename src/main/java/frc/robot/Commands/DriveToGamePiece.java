@@ -57,18 +57,19 @@ public class DriveToGamePiece extends Command {
   public void execute() {
 		if (ll.hasTarget()){ // || distanceTimer.hasElapsed(convertVertToTime(ll.getNoteVertical()))
       vert = ll.getNoteVertical();
-      if (distance == 0) {
-        distance = ll.getNoteVertical(); // This is the initial distance, we may want to do special cases here
-      }
+
+      // Setpoint is the current robot rotation with additional robot relative LL reading
       setpoint = Math.toRadians(-ll.getNoteHorizontal())+ drivetrain.getState().Pose.getRotation().getRadians();
       SmartDashboard.putNumber("Game Piece setpoint", setpoint);
 			thetaController.setSetpoint(setpoint);
       if (!thetaController.atSetpoint() ){
 				thetaOutput = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);
         SmartDashboard.putNumber("theta output", thetaOutput);
-			}
+			} else {
+        thetaOutput = 0;
+      }
 		}
-    double xScaled = 0.2 + (vert + 15) * 0.04;
+    double xScaled = 0.2 + Math.max((vert + 10) * 0.07, 0);
     SmartDashboard.putNumber("notescaled", xScaled);
     drivetrain.setControl(drive.withVelocityX(xScaled * TunerConstants.kSpeedAt12VoltsMps).withVelocityY(yOutput).withRotationalRate(thetaOutput));
 

@@ -117,4 +117,8 @@ public class Limelight extends SubsystemBase {
         .andThen(waitSeconds(2))
         .andThen(() -> LimelightHelpers.setLEDMode_ForceOff(ll));
   }
+
+  public Command ledsOff() {
+    return runOnce(() -> LimelightHelpers.setLEDMode_ForceOff(ll));
+  }
 }

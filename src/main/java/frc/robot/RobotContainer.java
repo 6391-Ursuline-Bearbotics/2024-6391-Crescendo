@@ -72,6 +72,7 @@ public class RobotContainer {
   public final Arm arm = new Arm();
   public final Shooter shooter = new Shooter();
   public final Intake intake = new Intake();
+  private final Command findNote;
   
   // Field-centric driving in Open Loop, can change to closed loop after characterization 
   // For closed loop replace DriveRequestType.OpenLoopVoltage with DriveRequestType.Velocity
@@ -102,6 +103,77 @@ public class RobotContainer {
   private ShotParameter shot;
   private double dist;
 
+  public RobotContainer() {
+    // Detect if controllers are missing / Stop multiple warnings
+    DriverStation.silenceJoystickConnectionWarning(true);
+
+    // Create PathPlanner Named Commands for use in Autos
+    NamedCommands.registerCommand("shooterAutoSpeed", shooter.setAutoSpeed());
+    NamedCommands.registerCommand("shooterSubSpeed", shooter.setSubSpeed());
+    NamedCommands.registerCommand("shooterStageSpeed", shooter.setStageSpeed());
+    NamedCommands.registerCommand("shooterAmpSpeed", shooter.setAmpSpeed());
+    NamedCommands.registerCommand("shooterOffSpeed", shooter.setOffSpeed());
+    NamedCommands.registerCommand("shoot", intake.shoot());
+    NamedCommands.registerCommand("armIntakePosition", arm.setIntakePosition());
+    NamedCommands.registerCommand("armStageShootPosition", arm.setStageShootPosition());
+    NamedCommands.registerCommand("armAutoShootPosition", arm.setAutoShootPosition());
+    NamedCommands.registerCommand("armSubShootPosition", arm.setSubShootPosition());
+    NamedCommands.registerCommand("armAmpPosition", arm.setAmpPosition());
+    NamedCommands.registerCommand("intakeOn", intake.intakeAutoStop());
+    NamedCommands.registerCommand("armAutoAndShoot", armAutoAndShoot());
+
+    drivetrain = TunerConstants.DriveTrain; // Make Drivetrain after Named Commands
+    shooterCamera = new Limelight(drivetrain, "limelight-tag");
+    findNote = new DriveToGamePiece(drivetrain, intakeCamera, intake, arm).until(() -> SmartDashboard.getBoolean("noteLoaded", false));
+    robo = new RoboticPathing(findNote);
+
+    autoAim.HeadingController.setPID(3.0, 0.0, 0.5);
+    autoAim.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
+
+    //PPHolonomicDriveController.setRotationTargetOverride(Optional.of(getSpeakerRotation()));
+
+    // Creating the routine commands here for top/bot so we can switch them depending on Alliance
+    topRoboticRoutine = runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
+        either(robo.topRobotic, robo.TopAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
+        robo.topSourceRobotic,
+        () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly());
+
+    botRoboticRoutine = runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
+        either(robo.botRobotic, robo.BotAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
+        robo.botSourceRobotic,
+        () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly());
+
+    // Build an auto chooser. This will use Commands.none() as the default option.
+    autoChooser = AutoBuilder.buildAutoChooser();
+
+    controlChooser.setDefaultOption("2 Joysticks", "2 Joysticks");
+    controlChooser.addOption("1 Joystick Rotation Triggers", "1 Joystick Rotation Triggers");
+    controlChooser.addOption("Split Joysticks Rotation Triggers", "Split Joysticks Rotation Triggers");
+    controlChooser.addOption("2 Joysticks with Gas Pedal", "2 Joysticks with Gas Pedal");
+    SmartDashboard.putData("Control Chooser", controlChooser);
+
+    speedChooser.addOption("100%", 1.0);
+    speedChooser.addOption("95%", 0.95);
+    speedChooser.addOption("90%", 0.9);
+    speedChooser.addOption("85%", 0.85);
+    speedChooser.addOption("80%", 0.8);
+    speedChooser.addOption("75%", 0.75);
+    speedChooser.addOption("70%", 0.7);
+    speedChooser.setDefaultOption("65%", 0.65);
+    speedChooser.addOption("60%", 0.6);
+    speedChooser.addOption("55%", 0.55);
+    speedChooser.addOption("50%", 0.5);
+    speedChooser.addOption("35%", 0.35);
+    SmartDashboard.putData("Speed Limit", speedChooser);
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    SmartDashboard.putBoolean("speaker", false);
+    SmartDashboard.putBoolean("noteLoaded", false);
+
+    configureBindings();
+  }
+
   private void configureBindings() {
     newControlStyle();
     newSpeed();
@@ -121,7 +193,8 @@ public class RobotContainer {
     drv.b().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // While held will stay aimed at the speaker driver still has translation control but not rotation
-    drv.a().whileTrue(drivetrain.run(() -> autoAim()));
+    drv.a().whileTrue(drivetrain.run(() -> autoAim())
+        .alongWith(distanceShot().repeatedly()));
 
     // Until we have a real robot / sensor this will simulate loading a note
     drv.povUp().onTrue(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true)));
@@ -136,7 +209,7 @@ public class RobotContainer {
         new Pose2d(drivetrain.getState().Pose.getTranslation(), drivetrain.getOperatorPerspective()))));
 
     // Drives to the game piece using turn, it will not strafe
-    drv.back().whileTrue(new DriveToGamePiece(drivetrain, intakeCamera, intake, arm));
+    drv.back().whileTrue(findNote);
 
     // Turtle Mode toggle
     drv.leftBumper().onTrue(either(
@@ -243,76 +316,6 @@ public class RobotContainer {
 
     // Drivetrain needs to be placed against a sturdy wall and test stopped immediately upon wheel slip
     //drv.back().and(drv.pov(0)).whileTrue(drivetrain.runDriveSlipTest());
-  }
-
-  public RobotContainer() {
-    // Detect if controllers are missing / Stop multiple warnings
-    DriverStation.silenceJoystickConnectionWarning(true);
-
-    // Create PathPlanner Named Commands for use in Autos
-    NamedCommands.registerCommand("shooterAutoSpeed", shooter.setAutoSpeed());
-    NamedCommands.registerCommand("shooterSubSpeed", shooter.setSubSpeed());
-    NamedCommands.registerCommand("shooterStageSpeed", shooter.setStageSpeed());
-    NamedCommands.registerCommand("shooterAmpSpeed", shooter.setAmpSpeed());
-    NamedCommands.registerCommand("shooterOffSpeed", shooter.setOffSpeed());
-    NamedCommands.registerCommand("shoot", intake.shoot());
-    NamedCommands.registerCommand("armIntakePosition", arm.setIntakePosition());
-    NamedCommands.registerCommand("armStageShootPosition", arm.setStageShootPosition());
-    NamedCommands.registerCommand("armAutoShootPosition", arm.setAutoShootPosition());
-    NamedCommands.registerCommand("armSubShootPosition", arm.setSubShootPosition());
-    NamedCommands.registerCommand("armAmpPosition", arm.setAmpPosition());
-    NamedCommands.registerCommand("intakeOn", intake.intakeAutoStop());
-    NamedCommands.registerCommand("armAutoAndShoot", armAutoAndShoot());
-
-    drivetrain = TunerConstants.DriveTrain; // Make Drivetrain after Named Commands
-    robo = new RoboticPathing();
-    shooterCamera = new Limelight(drivetrain, "limelight-tag");
-
-    autoAim.HeadingController.setPID(3.0, 0.0, 0.5);
-    autoAim.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
-
-    //PPHolonomicDriveController.setRotationTargetOverride(Optional.of(getSpeakerRotation()));
-
-    // Creating the routine commands here for top/bot so we can switch them depending on Alliance
-    topRoboticRoutine = runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
-        either(robo.topRobotic, robo.TopAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
-        robo.topSourceRobotic,
-        () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly());
-
-    botRoboticRoutine = runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
-        either(robo.botRobotic, robo.BotAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
-        robo.botSourceRobotic,
-        () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly());
-
-    // Build an auto chooser. This will use Commands.none() as the default option.
-    autoChooser = AutoBuilder.buildAutoChooser();
-
-    controlChooser.setDefaultOption("2 Joysticks", "2 Joysticks");
-    controlChooser.addOption("1 Joystick Rotation Triggers", "1 Joystick Rotation Triggers");
-    controlChooser.addOption("Split Joysticks Rotation Triggers", "Split Joysticks Rotation Triggers");
-    controlChooser.addOption("2 Joysticks with Gas Pedal", "2 Joysticks with Gas Pedal");
-    SmartDashboard.putData("Control Chooser", controlChooser);
-
-    speedChooser.addOption("100%", 1.0);
-    speedChooser.addOption("95%", 0.95);
-    speedChooser.addOption("90%", 0.9);
-    speedChooser.addOption("85%", 0.85);
-    speedChooser.addOption("80%", 0.8);
-    speedChooser.addOption("75%", 0.75);
-    speedChooser.addOption("70%", 0.7);
-    speedChooser.setDefaultOption("65%", 0.65);
-    speedChooser.addOption("60%", 0.6);
-    speedChooser.addOption("55%", 0.55);
-    speedChooser.addOption("50%", 0.5);
-    speedChooser.addOption("35%", 0.35);
-    SmartDashboard.putData("Speed Limit", speedChooser);
-
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-
-    SmartDashboard.putBoolean("speaker", false);
-    SmartDashboard.putBoolean("noteLoaded", false);
-
-    configureBindings();
   }
 
   public Command getAutonomousCommand() {
@@ -503,13 +506,16 @@ public class RobotContainer {
     // Turn the intake off whenever the note gets to the sensor
     intake.getIntakeStopSensor().onTrue(intake.intakeOff()
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true))));
+    intake.getIntakeStopSensor().onFalse(
+        new WaitCommand(0.2).andThen(shooter.setOffSpeed().andThen(arm.setStorePosition()))
+        .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", false)))
+        .alongWith(intakeCamera.ledsOff())
+        .alongWith(shooterCamera.ledsOff()));
+
     intake.getIntakeSlowSensor().onTrue(intake.intakeSlow()
         .alongWith(arm.setStorePosition())
         .alongWith(intakeCamera.blinkLEDS())
         .alongWith(shooterCamera.blinkLEDS()));
-    intake.getIntakeStopSensor().onFalse(
-        new WaitCommand(0.2).andThen(shooter.setOffSpeed())
-        .alongWith(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", false))));
   }
 
   private Command armAutoAndShoot() {

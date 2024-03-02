@@ -9,6 +9,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.generated.TunerConstants;
 
 public class RoboticPathing {
+  private Command findNote;
+
+  public RoboticPathing(Command findNote) {
+    this.findNote = findNote;
+  }
+
   // Load the path we want to pathfind to and follow
   public PathPlannerPath topPath = PathPlannerPath.fromPathFile("Top to Amp");
   public PathPlannerPath midPath = PathPlannerPath.fromPathFile("Mid to Amp");
@@ -66,17 +72,17 @@ public class RoboticPathing {
           topSource,
           constraints,
           0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-  );
+  ).andThen(findNote);
 
   public Command midSourceRobotic = AutoBuilder.pathfindThenFollowPath(
           midSource,
           constraints,
           0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-  );
+  ).andThen(findNote);
 
   public Command botSourceRobotic = AutoBuilder.pathfindThenFollowPath(
           botSource,
           constraints,
           0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-  );
+  ).andThen(findNote);
 }

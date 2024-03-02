@@ -1,0 +1,154 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.74,
+        "y": 4.52
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.2050697410876046,
+        "y": 1.8063389257368858
+      },
+      "isLocked": false,
+      "linkedName": "SourceStart"
+    },
+    {
+      "anchor": {
+        "x": 8.19682812889776,
+        "y": 0.8077125277685265
+      },
+      "prevControl": {
+        "x": 6.437746744868461,
+        "y": 0.7751369465827981
+      },
+      "nextControl": {
+        "x": 8.989854974343222,
+        "y": 0.822398210091591
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.669517167299094,
+        "y": 2.9371364646128226
+      },
+      "prevControl": {
+        "x": 7.317177644440873,
+        "y": 1.7551560938290727
+      },
+      "nextControl": {
+        "x": 6.08208987437653,
+        "y": 4.009191274196503
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.792458494007897,
+        "y": 4.944235343016141
+      },
+      "prevControl": {
+        "x": 5.861804639530567,
+        "y": 4.493818790857619
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "SourceShoot"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.55,
+      "rotationDegrees": -3.114787533554631,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0.75,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "armIntakePosition"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "intakeOn"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "After Intake",
+      "waypointRelativePos": 1.8,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "armStageShootPosition"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "shooterStageSpeed"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 3.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "shoot"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -5.572197803963805,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": -60.0,
+    "velocity": 0.0
+  },
+  "useDefaultConstraints": false
+}
