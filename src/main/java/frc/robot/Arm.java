@@ -38,7 +38,7 @@ public class Arm extends SubsystemBase {
 
   // Arm setpoints in degrees
   private static final double intakePosition = -2;
-  private static final double storePosition = 45.0;
+  private static final double storePosition = 18;
   private static final double ampPosition = 90.0;
 
   // Arm Contraints
@@ -135,6 +135,10 @@ public class Arm extends SubsystemBase {
 
   public Command setWingShootPosition() {
     return setArmGoalCommand(InterpolatingTable.wing.angle);
+  }
+
+  public Command setFarWingShootPosition() {
+    return setArmGoalCommand(InterpolatingTable.farwing.angle);
   }
 
   public Command setStageShootPosition() {

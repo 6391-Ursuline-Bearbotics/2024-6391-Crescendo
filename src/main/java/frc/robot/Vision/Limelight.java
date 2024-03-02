@@ -36,6 +36,7 @@ public class Limelight extends SubsystemBase {
 
   private final NetworkTable table = NetworkTableInstance.getDefault().getTable("Pose");
   private final DoubleArrayPublisher limelightPub = table.getDoubleArrayTopic("llPose").publish();
+  private final RectanglePoseArea fieldBoundary = new RectanglePoseArea(new Translation2d(0, 0), new Translation2d(16.541, 8.211));
 
   /** Creates a new Limelight. */
   public Limelight(CommandSwerveDrivetrain drivetrain, String ll) {
@@ -64,17 +65,18 @@ public class Limelight extends SubsystemBase {
       publishToField(limelightMeasurement);
 
       // No tag found so check no further
-      if(limelightMeasurement.tagCount >= 1) {
+      if(limelightMeasurement.tagCount >= 1 && fieldBoundary.isPoseWithinArea(limelightMeasurement.pose)) {
         // Excluding different measurements that are absolute showstoppers even with full trust 
         if(limelightMeasurement.avgTagDist < Units.feetToMeters(15) && drivetrain.getState().speeds.omegaRadiansPerSecond < Math.PI) {
           // Reasons to blindly trust as much as odometry
           if (trust || DriverStation.isDisabled() || 
               (limelightMeasurement.tagCount >= 2 && limelightMeasurement.avgTagDist < Units.feetToMeters(10))) {
-                confidence = 0.1;
+                confidence = 0.2;
+                trust = false;
           } else {
             compareDistance = limelightMeasurement.pose.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
             if( compareDistance < 0.5) {
-
+              confidence = 0.9;
             }
           }
         }
@@ -86,10 +88,11 @@ public class Limelight extends SubsystemBase {
   private void addPose(LimelightHelpers.PoseEstimate limelightMeasurement, double confide) {
     if(confide > 0) {
       SmartDashboard.putBoolean("PoseUpdate", true);
+      SmartDashboard.putNumber("LLConfidence", confide);
       drivetrain.addVisionMeasurement(
           limelightMeasurement.pose,
           limelightMeasurement.timestampSeconds,
-          VecBuilder.fill(confide, confide, Double.MAX_VALUE));
+          VecBuilder.fill(confide, confide, 99));
     } else {
       SmartDashboard.putBoolean("PoseUpdate", false);
     }

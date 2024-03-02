@@ -8,6 +8,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,7 +43,7 @@ public class DriveToGamePiece extends Command {
   private final double yOutput = 0;
   private double setpoint = 0;
   private double distance = 0;
-  private Timer distanceTimer = new Timer();
+  private Timer intakeTimer = new Timer();
   private double vert = 0.0;
 
   // Called when the command is initially scheduled.
@@ -50,6 +51,7 @@ public class DriveToGamePiece extends Command {
   public void initialize() {
     thetaController.reset();
     thetaController.setTolerance(0.05);
+    intakeTimer.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -73,8 +75,9 @@ public class DriveToGamePiece extends Command {
     SmartDashboard.putNumber("notescaled", xScaled);
     drivetrain.setControl(drive.withVelocityX(xScaled * TunerConstants.kSpeedAt12VoltsMps).withVelocityY(yOutput).withRotationalRate(thetaOutput));
 
-    if (vert < -10) {
+    if (vert < -10  && intakeTimer.hasElapsed(2)) {
       arm.setIntakePosition().alongWith(intake.intakeOn()).schedule();
+      intakeTimer.reset();
     }
   }
 

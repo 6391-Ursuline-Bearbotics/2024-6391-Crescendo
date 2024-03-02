@@ -72,17 +72,17 @@ public class RoboticPathing {
           topSource,
           constraints,
           0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-  ).andThen(findNote);
+  ); //.andThen(findNote);
 
   public Command midSourceRobotic = AutoBuilder.pathfindThenFollowPath(
           midSource,
           constraints,
           0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-  ).andThen(findNote);
+  ); //.andThen(findNote);
 
   public Command botSourceRobotic = AutoBuilder.pathfindThenFollowPath(
           botSource,
           constraints,
           0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-  ).andThen(findNote);
+  ); //.andThen(findNote);
 }

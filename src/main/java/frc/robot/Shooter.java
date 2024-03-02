@@ -80,6 +80,10 @@ public class Shooter extends SubsystemBase {
     return runOnce(() -> setRPS(InterpolatingTable.wing.rps));
   }
 
+  public Command setFarWingSpeed() {
+    return runOnce(() -> setRPS(InterpolatingTable.farwing.rps));
+  }
+
   public Command setAmpSpeed() {
     return runOnce(() -> setRPS(30));
   }

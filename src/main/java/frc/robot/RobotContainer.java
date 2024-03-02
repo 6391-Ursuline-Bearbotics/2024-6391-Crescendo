@@ -193,8 +193,7 @@ public class RobotContainer {
     drv.b().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // While held will stay aimed at the speaker driver still has translation control but not rotation
-    drv.a().whileTrue(drivetrain.run(() -> autoAim())
-        .alongWith(distanceShot().repeatedly()));
+    drv.a().whileTrue(drivetrain.run(() -> autoAim()));
 
     // Until we have a real robot / sensor this will simulate loading a note
     drv.povUp().onTrue(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true)));
@@ -248,8 +247,8 @@ public class RobotContainer {
         .alongWith(intake.intakeOn()));
 
     // Shoot from the Wing Line
-    op.povUp().onTrue(arm.setWingShootPosition()
-        .alongWith(shooter.setWingSpeed())
+    op.povUp().onTrue(arm.setFarWingShootPosition()
+        .alongWith(shooter.setFarWingSpeed())
         .alongWith(intake.intakeOff()));    
 
     // Shoot from the Auto Circle
@@ -432,11 +431,12 @@ public class RobotContainer {
   }
 
   private Rotation2d getSpeakerRotation() {
-    if (!blue) {
+/*     if (!blue) {
       speaker = Constants.Field.redSpeaker;
     } else {
       speaker = Constants.Field.blueSpeaker; //getMovingSpeaker(true);
-    }
+    } */
+    speaker = getMovingSpeaker(blue);
     Rotation2d currentAngle = drivetrain.getState().Pose.getRotation().plus(new Rotation2d(Math.PI));
     Rotation2d setpoint = speaker.minus(drivetrain.getState().Pose.getTranslation()).getAngle();
     SmartDashboard.putNumber("Auto Aim Robot", currentAngle.getRadians());
