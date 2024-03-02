@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     SmartDashboard.putString("AutoAlliance", DriverStation.getAlliance().toString());
 
-    m_robotContainer.intakeCamera.setPipeline(1);
+    //m_robotContainer.intakeCamera.setPipeline(1);
     stopAll();
 
     // Allows the simulation sensor to work on the proper side of the field
@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     SmartDashboard.putString("TeleopAlliance", DriverStation.getAlliance().toString());
 
-    m_robotContainer.intakeCamera.setPipeline(1);
+    //m_robotContainer.intakeCamera.setPipeline(1);
     stopAll();
     m_robotContainer.createIntakeTrigger();
 

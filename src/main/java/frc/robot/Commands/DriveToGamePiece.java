@@ -12,8 +12,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Arm;
 import frc.robot.CommandSwerveDrivetrain;
 import frc.robot.Constants;
+import frc.robot.Intake;
 import frc.robot.Vision.Detector;
 import frc.robot.generated.TunerConstants;
 
@@ -22,21 +24,26 @@ public class DriveToGamePiece extends Command {
 
   private Detector ll;
   private CommandSwerveDrivetrain drivetrain;
-  private PIDController thetaController = new PIDController(4.0, 0, 0.05);
-  public DriveToGamePiece(CommandSwerveDrivetrain drivetrain, Detector ll) {
+  private Intake intake;
+  private Arm arm;
+  private PIDController thetaController = new PIDController(2.0, 0, 0.05);
+  public DriveToGamePiece(CommandSwerveDrivetrain drivetrain, Detector ll, Intake intake, Arm arm) {
     addRequirements(drivetrain);
     this.drivetrain = drivetrain;
     this.ll = ll;
+    this.intake = intake;
+    this.arm = arm;
   }
   private final SwerveRequest.RobotCentric drive = new SwerveRequest.RobotCentric()
     //.withDeadband(TunerConstants.kSpeedAt12VoltsMps * 0.01).withRotationalDeadband(Constants.Drive.MaxAngularRate * 0.01)
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
   private double thetaOutput = 0;
-  private final double xOutput = 0.2; // Speed to drive towards note will increase after testing
+  private double xOutput = 0.2; // Speed to drive towards note will increase after testing
   private final double yOutput = 0;
   private double setpoint = 0;
   private double distance = 0;
   private Timer distanceTimer = new Timer();
+  private double vert = 0.0;
 
   // Called when the command is initially scheduled.
   @Override
@@ -49,6 +56,7 @@ public class DriveToGamePiece extends Command {
   @Override
   public void execute() {
 		if (ll.hasTarget()){ // || distanceTimer.hasElapsed(convertVertToTime(ll.getNoteVertical()))
+      vert = ll.getNoteVertical();
       if (distance == 0) {
         distance = ll.getNoteVertical(); // This is the initial distance, we may want to do special cases here
       }
@@ -60,8 +68,13 @@ public class DriveToGamePiece extends Command {
         SmartDashboard.putNumber("theta output", thetaOutput);
 			}
 		}
-    
-    drivetrain.setControl(drive.withVelocityX(-xOutput * TunerConstants.kSpeedAt12VoltsMps).withVelocityY(yOutput).withRotationalRate(thetaOutput));
+    double xScaled = 0.2 + (vert + 15) * 0.04;
+    SmartDashboard.putNumber("notescaled", xScaled);
+    drivetrain.setControl(drive.withVelocityX(xScaled * TunerConstants.kSpeedAt12VoltsMps).withVelocityY(yOutput).withRotationalRate(thetaOutput));
+
+    if (vert < -10) {
+      arm.setIntakePosition().alongWith(intake.intakeOn()).schedule();
+    }
   }
 
   // Called once the command ends or is interrupted.

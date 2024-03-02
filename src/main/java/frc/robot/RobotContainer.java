@@ -136,7 +136,7 @@ public class RobotContainer {
         new Pose2d(drivetrain.getState().Pose.getTranslation(), drivetrain.getOperatorPerspective()))));
 
     // Drives to the game piece using turn, it will not strafe
-    drv.back().whileTrue(new DriveToGamePiece(drivetrain, intakeCamera));
+    drv.back().whileTrue(new DriveToGamePiece(drivetrain, intakeCamera, intake, arm));
 
     // Turtle Mode toggle
     drv.leftBumper().onTrue(either(
@@ -317,6 +317,7 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     /* First put the drivetrain into auto run mode, then run the auto */
+    SmartDashboard.putString("AutoName", autoChooser.getSelected().getName());
     return autoChooser.getSelected();
   }
 
