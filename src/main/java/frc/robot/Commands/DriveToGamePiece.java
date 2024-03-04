@@ -65,16 +65,16 @@ public class DriveToGamePiece extends Command {
       setpoint = Math.toRadians(-ll.getNoteHorizontal())+ drivetrain.getState().Pose.getRotation().getRadians();
       SmartDashboard.putNumber("Game Piece setpoint", setpoint);
 			thetaController.setSetpoint(setpoint);
-      if (!thetaController.atSetpoint() ){
-				thetaOutput = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);
-        SmartDashboard.putNumber("theta output", thetaOutput);
-			} else {
-        thetaOutput = 0;
-      }
+//      if (!thetaController.atSetpoint() ){
+//				thetaOutput = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);
+//        SmartDashboard.putNumber("theta output", thetaOutput);
+//			} else {
+//        thetaOutput = 0;
+//      }
 
       // If the note is close then we need to drop the intake before we approach it.
       // Before we do any of that we need to also verify that we are aligned to it
-      if (vert < -17) {
+      if (vert < -16) {
         if (thetaController.atSetpoint()) {
           if (intakeTimer.hasElapsed(2)) {
             intake.schedule();
@@ -85,7 +85,7 @@ public class DriveToGamePiece extends Command {
           xScaled = 0.0;
         }
       } else {
-        xScaled = xOutput + Math.max((vert + 16) * 0.03, 0);
+        xScaled = xOutput + Math.max((vert + 14) * 0.03, 0); // speed scale
       }
 		} else {
       // Normally stop unless we just put down the intake then drive for 1.5 second, drive straight
