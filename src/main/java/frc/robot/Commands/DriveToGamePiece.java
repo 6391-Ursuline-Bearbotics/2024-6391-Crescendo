@@ -66,8 +66,8 @@ public class DriveToGamePiece extends Command {
       SmartDashboard.putNumber("Game Piece setpoint", setpoint);
 			thetaController.setSetpoint(setpoint);
 //      if (!thetaController.atSetpoint() ){
-//				thetaOutput = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);
-//        SmartDashboard.putNumber("theta output", thetaOutput);
+				thetaOutput = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);
+        SmartDashboard.putNumber("theta output", thetaOutput);
 //			} else {
 //        thetaOutput = 0;
 //      }
