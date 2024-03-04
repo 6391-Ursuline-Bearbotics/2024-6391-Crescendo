@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.74,
-        "y": 4.52
+        "x": 2.542840434518079,
+        "y": 3.4805067105661944
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2050697410876046,
-        "y": 1.8063389257368858
+        "x": 5.391862805192516,
+        "y": 1.8210246080599504
       },
       "isLocked": false,
-      "linkedName": "SourceStart"
+      "linkedName": "SourceShoot"
     },
     {
       "anchor": {
@@ -20,40 +20,24 @@
         "y": 0.8077125277685265
       },
       "prevControl": {
-        "x": 6.437746744868461,
-        "y": 0.7751369465827981
+        "x": 5.685533511429324,
+        "y": 0.8077125277685214
       },
       "nextControl": {
-        "x": 8.989854974343222,
-        "y": 0.822398210091591
+        "x": 9.351122759490599,
+        "y": 0.8077125277685289
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "C5"
     },
     {
       "anchor": {
-        "x": 6.669517167299094,
-        "y": 2.9371364646128226
+        "x": 2.542840434518079,
+        "y": 3.4805067105661944
       },
       "prevControl": {
-        "x": 7.317177644440873,
-        "y": 1.7551560938290727
-      },
-      "nextControl": {
-        "x": 6.08208987437653,
-        "y": 4.009191274196503
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.792458494007897,
-        "y": 4.944235343016141
-      },
-      "prevControl": {
-        "x": 5.861804639530567,
-        "y": 4.493818790857619
+        "x": 4.217008219347387,
+        "y": 2.011938478259783
       },
       "nextControl": null,
       "isLocked": false,
@@ -62,8 +46,13 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.55,
-      "rotationDegrees": -3.114787533554631,
+      "waypointRelativePos": 1.35,
+      "rotationDegrees": 0.0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 0.75,
+      "rotationDegrees": 0,
       "rotateFast": false
     }
   ],
@@ -94,7 +83,7 @@
     },
     {
       "name": "After Intake",
-      "waypointRelativePos": 1.8,
+      "waypointRelativePos": 1.4,
       "command": {
         "type": "parallel",
         "data": {
@@ -102,13 +91,7 @@
             {
               "type": "named",
               "data": {
-                "name": "armStageShootPosition"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "shooterStageSpeed"
+                "name": "armAutoShootPosition"
               }
             }
           ]
@@ -117,7 +100,7 @@
     },
     {
       "name": "Shoot",
-      "waypointRelativePos": 3.0,
+      "waypointRelativePos": 2.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -141,13 +124,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -5.572197803963805,
+    "rotation": -40.0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": -60.0,
+    "rotation": -40.0,
     "velocity": 0.0
   },
   "useDefaultConstraints": false

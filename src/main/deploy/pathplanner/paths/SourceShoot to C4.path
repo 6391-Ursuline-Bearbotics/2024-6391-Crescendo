@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.792458494007897,
-        "y": 4.944235343016141
+        "x": 2.542840434518079,
+        "y": 3.4805067105661944
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.145126653889672,
-        "y": 3.7967995935991876
+        "x": 4.848492559239144,
+        "y": 0.6461700222148214
       },
       "isLocked": false,
       "linkedName": "SourceShoot"
@@ -20,24 +20,24 @@
         "y": 2.602720114531139
       },
       "prevControl": {
-        "x": 7.622097875126826,
-        "y": 2.8356688960782415
+        "x": 7.770943341528902,
+        "y": 2.525937359567027
       },
       "nextControl": {
-        "x": 8.568776410280094,
-        "y": 2.3042002447641265
+        "x": 8.366829905238546,
+        "y": 2.6978830528644933
       },
       "isLocked": false,
       "linkedName": "C4"
     },
     {
       "anchor": {
-        "x": 3.792458494007897,
-        "y": 4.944235343016141
+        "x": 2.542840434518079,
+        "y": 3.4805067105661944
       },
       "prevControl": {
-        "x": 4.782573871539015,
-        "y": 3.983508018406507
+        "x": 5.054092111762042,
+        "y": 0.6461700222148214
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,7 +47,12 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.55,
-      "rotationDegrees": -29.25248265664553,
+      "rotationDegrees": 0.0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1.35,
+      "rotationDegrees": 0,
       "rotateFast": false
     }
   ],
@@ -86,19 +91,24 @@
             {
               "type": "named",
               "data": {
-                "name": "armStageShootPosition"
+                "name": "shoot"
               }
-            },
-            {
-              "type": "wait",
-              "data": {
-                "waitTime": 0.4
-              }
-            },
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ArmShoot",
+      "waypointRelativePos": 1.7,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
             {
               "type": "named",
               "data": {
-                "name": "shoot"
+                "name": "armAutoShootPosition"
               }
             }
           ]
@@ -114,13 +124,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -5.572197803963805,
+    "rotation": -40.0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": -5.079607860014578,
+    "rotation": -40.0,
     "velocity": 0.0
   },
   "useDefaultConstraints": false

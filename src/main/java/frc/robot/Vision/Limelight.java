@@ -64,7 +64,7 @@ public class Limelight extends SubsystemBase {
       // We are publishing this to view as a ghost to try and help determine when not to use the LL measurements
       publishToField(limelightMeasurement);
 
-      // No tag found so check no further
+      // No tag found so check no further or pose not within field boundary
       if(limelightMeasurement.tagCount >= 1 && fieldBoundary.isPoseWithinArea(limelightMeasurement.pose)) {
         // Excluding different measurements that are absolute showstoppers even with full trust 
         if(limelightMeasurement.avgTagDist < Units.feetToMeters(15) && drivetrain.getState().speeds.omegaRadiansPerSecond < Math.PI) {
@@ -76,7 +76,7 @@ public class Limelight extends SubsystemBase {
           } else {
             compareDistance = limelightMeasurement.pose.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
             if( compareDistance < 0.5) {
-              confidence = 0.9;
+              confidence = 0.7;
             }
           }
         }

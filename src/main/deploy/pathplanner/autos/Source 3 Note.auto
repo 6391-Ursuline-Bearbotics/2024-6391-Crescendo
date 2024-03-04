@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.74,
-      "y": 4.52
+      "x": 1.5,
+      "y": 4.1
     },
-    "rotation": -60.0
+    "rotation": 0.0
   },
   "command": {
     "type": "sequential",
@@ -24,27 +24,21 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "shoot"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "Source to C3"
+            "pathName": "SourceStart to SourceShoot"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "SourceShoot to C4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Source to C5"
           }
         }
       ]

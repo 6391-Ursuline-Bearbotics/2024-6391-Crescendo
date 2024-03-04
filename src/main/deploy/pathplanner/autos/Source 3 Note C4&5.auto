@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.74,
-      "y": 4.52
+      "x": 1.5,
+      "y": 4.1
     },
-    "rotation": -60.0
+    "rotation": 0.0
   },
   "command": {
     "type": "sequential",
@@ -14,25 +14,19 @@
         {
           "type": "named",
           "data": {
-            "name": "shooterSubSpeed"
+            "name": "shooterAutoSpeed"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "armSubShootPosition"
+            "name": "armAutoShootPosition"
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "shoot"
+            "pathName": "SourceStart to SourceShoot"
           }
         },
         {
