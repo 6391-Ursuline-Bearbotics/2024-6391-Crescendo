@@ -86,12 +86,6 @@
             {
               "type": "named",
               "data": {
-                "name": "armStageShootPosition"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
                 "name": "shooterStageSpeed"
               }
             }
@@ -103,9 +97,21 @@
       "name": "Shoot",
       "waypointRelativePos": 2.0,
       "command": {
-        "type": "parallel",
+        "type": "sequential",
         "data": {
           "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "armStageShootPosition"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 0.4
+              }
+            },
             {
               "type": "named",
               "data": {

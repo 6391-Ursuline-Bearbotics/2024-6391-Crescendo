@@ -77,8 +77,8 @@
       }
     },
     {
-      "name": "After Intake",
-      "waypointRelativePos": 1.0,
+      "name": "Shoot",
+      "waypointRelativePos": 2.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -88,18 +88,13 @@
               "data": {
                 "name": "armStageShootPosition"
               }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 2.0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 0.4
+              }
+            },
             {
               "type": "named",
               "data": {

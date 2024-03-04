@@ -16,6 +16,18 @@
           "data": {
             "pathName": "Test"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "findNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Testback"
+          }
         }
       ]
     }

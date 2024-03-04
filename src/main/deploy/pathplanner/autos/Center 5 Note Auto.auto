@@ -76,12 +76,6 @@
           "data": {
             "pathName": "A1 to C1"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "A2 to C2"
-          }
         }
       ]
     }

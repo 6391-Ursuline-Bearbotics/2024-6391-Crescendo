@@ -8,15 +8,12 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Arm;
 import frc.robot.CommandSwerveDrivetrain;
-import frc.robot.Constants;
-import frc.robot.Intake;
 import frc.robot.Vision.Detector;
 import frc.robot.generated.TunerConstants;
 
@@ -25,10 +22,10 @@ public class DriveToGamePiece extends Command {
 
   private Detector ll;
   private CommandSwerveDrivetrain drivetrain;
-  private Intake intake;
+  private Command intake;
   private Arm arm;
   private PIDController thetaController = new PIDController(2.0, 0, 0.05);
-  public DriveToGamePiece(CommandSwerveDrivetrain drivetrain, Detector ll, Intake intake, Arm arm) {
+  public DriveToGamePiece(CommandSwerveDrivetrain drivetrain, Detector ll, Command intake, Arm arm) {
     addRequirements(drivetrain);
     this.drivetrain = drivetrain;
     this.ll = ll;
@@ -39,19 +36,21 @@ public class DriveToGamePiece extends Command {
     //.withDeadband(TunerConstants.kSpeedAt12VoltsMps * 0.01).withRotationalDeadband(Constants.Drive.MaxAngularRate * 0.01)
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
   private double thetaOutput = 0;
-  private double xOutput = 0.2; // Speed to drive towards note will increase after testing
+  private double xOutput = 0.2; // Minimum speed to drive towards note
   private final double yOutput = 0;
   private double setpoint = 0;
-  private double distance = 0;
   private Timer intakeTimer = new Timer();
+  private Timer blindTimer = new Timer();
   private double vert = 0.0;
+  private double xScaled = 0.0;
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     thetaController.reset();
-    thetaController.setTolerance(0.05);
+    thetaController.setTolerance(Units.degreesToRadians(2));
     intakeTimer.start();
+    arm.setStorePosition();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -59,6 +58,8 @@ public class DriveToGamePiece extends Command {
   public void execute() {
 		if (ll.hasTarget()){ // || distanceTimer.hasElapsed(convertVertToTime(ll.getNoteVertical()))
       vert = ll.getNoteVertical();
+      blindTimer.start();
+      blindTimer.reset();
 
       // Setpoint is the current robot rotation with additional robot relative LL reading
       setpoint = Math.toRadians(-ll.getNoteHorizontal())+ drivetrain.getState().Pose.getRotation().getRadians();
@@ -70,15 +71,32 @@ public class DriveToGamePiece extends Command {
 			} else {
         thetaOutput = 0;
       }
-		}
-    double xScaled = 0.2 + Math.max((vert + 10) * 0.07, 0);
+
+      // If the note is close then we need to drop the intake before we approach it.
+      // Before we do any of that we need to also verify that we are aligned to it
+      if (vert < -10) {
+        if (thetaController.atSetpoint()  && intakeTimer.hasElapsed(2)) {
+          arm.setIntakePosition().alongWith(intake).schedule();
+          intakeTimer.reset();
+          xScaled = xOutput;
+        } else {
+          xScaled = 0.0;
+        }
+      } else {
+        xScaled = xOutput + Math.max((vert + 10) * 0.07, 0);
+      }
+		} else {
+      // Normally stop unless we just put down the intake then drive for 1 second, drive straight
+      thetaOutput = 0;
+      if (blindTimer.hasElapsed(1)) {
+        xScaled = 0;
+      } else {
+        xScaled = xOutput;
+      }
+    }
+
     SmartDashboard.putNumber("notescaled", xScaled);
     drivetrain.setControl(drive.withVelocityX(xScaled * TunerConstants.kSpeedAt12VoltsMps).withVelocityY(yOutput).withRotationalRate(thetaOutput));
-
-    if (vert < -10  && intakeTimer.hasElapsed(2)) {
-      arm.setIntakePosition().alongWith(intake.intakeOn()).schedule();
-      intakeTimer.reset();
-    }
   }
 
   // Called once the command ends or is interrupted.
@@ -91,9 +109,5 @@ public class DriveToGamePiece extends Command {
   @Override
   public boolean isFinished() {
     return false;
-  }
-
-  private Pose2d getNotePose(double distance, double yaw) {
-    return new Pose2d(null, null, null);
   }
 }

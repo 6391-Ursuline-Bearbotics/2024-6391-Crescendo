@@ -22,6 +22,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -73,6 +74,7 @@ public class RobotContainer {
   public final Shooter shooter = new Shooter();
   public final Intake intake = new Intake();
   private final Command findNote;
+  private final Command autofindNote;
   
   // Field-centric driving in Open Loop, can change to closed loop after characterization 
   // For closed loop replace DriveRequestType.OpenLoopVoltage with DriveRequestType.Velocity
@@ -107,6 +109,21 @@ public class RobotContainer {
     // Detect if controllers are missing / Stop multiple warnings
     DriverStation.silenceJoystickConnectionWarning(true);
 
+    drivetrain = TunerConstants.DriveTrain; // Make Drivetrain after Named Commands
+    shooterCamera = new Limelight(drivetrain, "limelight-tag");
+    findNote = new DriveToGamePiece(drivetrain, intakeCamera, intake.intakeOn(), arm)
+        .until(() -> SmartDashboard.getBoolean("noteLoaded", false))
+        .withTimeout(3)
+        .alongWith(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)));
+
+    autofindNote = new DriveToGamePiece(drivetrain, intakeCamera, intake.intakeAutoStop(), arm)
+        .until(() -> intake.getIntakeStopSensor().getAsBoolean())
+        .withTimeout(3);
+
+    autoAim.HeadingController.setPID(3.0, 0.0, 0.5);
+    autoAim.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
+    autoAim.HeadingController.setTolerance(Units.degreesToRadians(1));
+
     // Create PathPlanner Named Commands for use in Autos
     NamedCommands.registerCommand("shooterAutoSpeed", shooter.setAutoSpeed());
     NamedCommands.registerCommand("shooterSubSpeed", shooter.setSubSpeed());
@@ -121,27 +138,22 @@ public class RobotContainer {
     NamedCommands.registerCommand("armAmpPosition", arm.setAmpPosition());
     NamedCommands.registerCommand("intakeOn", intake.intakeAutoStop());
     NamedCommands.registerCommand("armAutoAndShoot", armAutoAndShoot());
-
-    drivetrain = TunerConstants.DriveTrain; // Make Drivetrain after Named Commands
-    shooterCamera = new Limelight(drivetrain, "limelight-tag");
-    findNote = new DriveToGamePiece(drivetrain, intakeCamera, intake, arm).until(() -> SmartDashboard.getBoolean("noteLoaded", false));
-    robo = new RoboticPathing(findNote);
-
-    autoAim.HeadingController.setPID(3.0, 0.0, 0.5);
-    autoAim.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
+    NamedCommands.registerCommand("findNote", autofindNote);
+    drivetrain.configurePathPlanner();
+    robo = new RoboticPathing();
 
     //PPHolonomicDriveController.setRotationTargetOverride(Optional.of(getSpeakerRotation()));
 
     // Creating the routine commands here for top/bot so we can switch them depending on Alliance
-    topRoboticRoutine = runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
+/*     topRoboticRoutine = runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
         either(robo.topRobotic, robo.TopAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
-        robo.topSourceRobotic,
+        robo.topSourceRobotic.andThen(findNote),
         () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly());
 
     botRoboticRoutine = runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
         either(robo.botRobotic, robo.BotAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
-        robo.botSourceRobotic,
-        () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly());
+        robo.botSourceRobotic.andThen(findNote),
+        () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly()); */
 
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -152,14 +164,14 @@ public class RobotContainer {
     controlChooser.addOption("2 Joysticks with Gas Pedal", "2 Joysticks with Gas Pedal");
     SmartDashboard.putData("Control Chooser", controlChooser);
 
-    speedChooser.addOption("100%", 1.0);
+    speedChooser.setDefaultOption("100%", 1.0);
     speedChooser.addOption("95%", 0.95);
     speedChooser.addOption("90%", 0.9);
     speedChooser.addOption("85%", 0.85);
     speedChooser.addOption("80%", 0.8);
     speedChooser.addOption("75%", 0.75);
     speedChooser.addOption("70%", 0.7);
-    speedChooser.setDefaultOption("65%", 0.65);
+    speedChooser.addOption("65%", 0.65);
     speedChooser.addOption("60%", 0.6);
     speedChooser.addOption("55%", 0.55);
     speedChooser.addOption("50%", 0.5);
@@ -180,6 +192,7 @@ public class RobotContainer {
 
     // Set up Driver Controls ================================================
     // Does full automation while held on the Amp side of the field
+    drv.x().whileTrue(findNote);
     drv.x().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // Does full automation while held though the middle of the field
@@ -190,6 +203,7 @@ public class RobotContainer {
     drv.y().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // Does full automation while held on the Source side of the field
+    drv.b().whileTrue(robo.pathToAmp.alongWith(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true))));
     drv.b().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // While held will stay aimed at the speaker driver still has translation control but not rotation
@@ -390,12 +404,12 @@ public class RobotContainer {
   public void colorReceived(Alliance ally) {
     if (ally == Alliance.Blue) {
       blue = true;
-      drv.x().whileTrue(topRoboticRoutine);
-      drv.b().whileTrue(botRoboticRoutine);
+      //drv.x().whileTrue(topRoboticRoutine);
+      //drv.b().whileTrue(botRoboticRoutine);
     } else {
       blue = false;
-      drv.x().whileTrue(botRoboticRoutine);
-      drv.b().whileTrue(topRoboticRoutine);
+      //drv.x().whileTrue(botRoboticRoutine);
+      //drv.b().whileTrue(topRoboticRoutine);
     }
     if (Utils.isSimulation()) {
       if (ally == Alliance.Blue) {
