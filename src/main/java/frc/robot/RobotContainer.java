@@ -111,12 +111,12 @@ public class RobotContainer {
 
     drivetrain = TunerConstants.DriveTrain; // Make Drivetrain after Named Commands
     shooterCamera = new Limelight(drivetrain, "limelight-tag");
-    findNote = new DriveToGamePiece(drivetrain, intakeCamera, intake.intakeOn(), arm)
+    findNote = new DriveToGamePiece(drivetrain, intakeCamera, arm.setIntakePosition().andThen(intake.intakeOn()), arm)
         .until(() -> SmartDashboard.getBoolean("noteLoaded", false))
         .withTimeout(3)
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)));
 
-    autofindNote = new DriveToGamePiece(drivetrain, intakeCamera, intake.intakeAutoStop(), arm)
+    autofindNote = new DriveToGamePiece(drivetrain, intakeCamera, arm.setIntakePosition().andThen(intake.intakeAutoStop()), arm)
         .until(() -> intake.getIntakeStopSensor().getAsBoolean())
         .withTimeout(3);
 
