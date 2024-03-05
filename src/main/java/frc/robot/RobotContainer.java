@@ -276,7 +276,7 @@ public class RobotContainer {
         .alongWith(intake.intakeOff()));
 
     // Shoot from Interpolated Spot
-    op.povRight().whileTrue(distanceShot().repeatedly()
+    op.povRight().and(intake.getIntakeStopSensor()).whileTrue(distanceShot().repeatedly()
         .alongWith(intake.intakeOff()));
 
     // Controls if the Robotic Pathing will drive to the speaker or amp
