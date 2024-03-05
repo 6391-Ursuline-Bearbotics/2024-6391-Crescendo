@@ -74,7 +74,7 @@ public class DriveToGamePiece extends Command {
 
       // If the note is close then we need to drop the intake before we approach it.
       // Before we do any of that we need to also verify that we are aligned to it
-      if (vert < -16) {
+      if (vert < -15) {
         if (thetaController.atSetpoint()) {
           if (intakeTimer.hasElapsed(2)) {
             intake.schedule();
