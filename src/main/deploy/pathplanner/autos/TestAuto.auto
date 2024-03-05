@@ -12,6 +12,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "armStageShootPosition"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Test"

@@ -533,7 +533,7 @@ public class RobotContainer {
   }
 
   private Command armAutoAndShoot() {
-    return arm.setAutoShootPosition()
+    return arm.distanceShot()
         .andThen(waitSeconds(0.4))
         .andThen(intake.shoot());
   }
