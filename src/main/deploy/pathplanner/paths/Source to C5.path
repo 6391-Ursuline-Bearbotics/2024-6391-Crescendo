@@ -3,32 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.542840434518079,
-        "y": 3.4805067105661944
+        "x": 6.283665236369619,
+        "y": 1.645754560785515
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.391862805192516,
-        "y": 1.8210246080599504
+        "x": 7.169840769100281,
+        "y": 1.3730851660991583
       },
       "isLocked": false,
-      "linkedName": "SourceShoot"
-    },
-    {
-      "anchor": {
-        "x": 8.19682812889776,
-        "y": 0.8077125277685265
-      },
-      "prevControl": {
-        "x": 5.685533511429324,
-        "y": 0.8077125277685214
-      },
-      "nextControl": {
-        "x": 9.351122759490599,
-        "y": 0.8077125277685289
-      },
-      "isLocked": false,
-      "linkedName": "C5"
+      "linkedName": "SourcePickup"
     },
     {
       "anchor": {
@@ -36,7 +20,7 @@
         "y": 3.4805067105661944
       },
       "prevControl": {
-        "x": 4.217008219347387,
+        "x": 4.2170082193473775,
         "y": 2.011938478259783
       },
       "nextControl": null,
@@ -46,12 +30,12 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.35,
+      "waypointRelativePos": 0.7,
       "rotationDegrees": 0.0,
       "rotateFast": false
     },
     {
-      "waypointRelativePos": 0.75,
+      "waypointRelativePos": 0.4,
       "rotationDegrees": 0,
       "rotateFast": false
     }
@@ -60,7 +44,7 @@
   "eventMarkers": [
     {
       "name": "Intake",
-      "waypointRelativePos": 0.75,
+      "waypointRelativePos": 0.4,
       "command": {
         "type": "parallel",
         "data": {
@@ -83,7 +67,7 @@
     },
     {
       "name": "After Intake",
-      "waypointRelativePos": 1.4,
+      "waypointRelativePos": 0.7,
       "command": {
         "type": "parallel",
         "data": {
@@ -100,7 +84,7 @@
     },
     {
       "name": "Shoot",
-      "waypointRelativePos": 2.0,
+      "waypointRelativePos": 1.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -130,7 +114,7 @@
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": -40.0,
+    "rotation": -60.0,
     "velocity": 0.0
   },
   "useDefaultConstraints": false

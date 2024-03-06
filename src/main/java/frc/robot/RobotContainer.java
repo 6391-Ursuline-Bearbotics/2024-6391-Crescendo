@@ -289,7 +289,8 @@ public class RobotContainer {
     op.rightTrigger().onTrue(arm.relativeAngleChange(1.0));
 
     op.back().onTrue(arm.setClimbPosition());
-    op.start().onTrue(climb.climb());
+    op.start().whileTrue(climb.climbVoltage(6));
+    op.start().onFalse(climb.climbVoltage(0));
 
     // TRIGGERS==================================================================
     // When a note is detected by the camera near the intake turn the lights green
