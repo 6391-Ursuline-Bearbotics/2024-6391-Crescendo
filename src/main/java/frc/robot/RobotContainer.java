@@ -67,12 +67,13 @@ public class RobotContainer {
   private final SlewRateLimiter rotLimiter = new SlewRateLimiter(2);
 
   // Starting the other subsystems
-  private final LEDSubsystem lights = new LEDSubsystem();
+  //private final LEDSubsystem lights = new LEDSubsystem();
   public final Detector intakeCamera = new Detector("limelight-note");
   private final Limelight shooterCamera;
   public final Arm arm = new Arm();
   public final Shooter shooter = new Shooter();
   public final Intake intake = new Intake();
+  public final Climber climb = new Climber();
   private final Command findNote;
   private final Command autofindNote;
   
@@ -191,18 +192,18 @@ public class RobotContainer {
     newSpeed();
 
     // Set up Driver Controls ================================================
-    // Does full automation while held on the Amp side of the field
+    // Use the intake limelight to drive towards a note and drop the intake right before getting there
     drv.x().whileTrue(findNote);
     drv.x().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // Does full automation while held though the middle of the field
-    drv.y().whileTrue(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
+/*     drv.y().whileTrue(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(
       either(robo.midRobotic, robo.MidAmpRobotic, () -> SmartDashboard.getBoolean("speaker",false)),
       robo.midSourceRobotic,
       () -> SmartDashboard.getBoolean("noteLoaded", false)).repeatedly()));
-    drv.y().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
+    drv.y().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false))); */
 
-    // Does full automation while held on the Source side of the field
+    // Drives avoiding obstacles to the Amp
     drv.b().whileTrue(robo.pathToAmp.alongWith(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true))));
     drv.b().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
@@ -276,19 +277,19 @@ public class RobotContainer {
         .alongWith(intake.intakeOff()));
 
     // Shoot from Interpolated Spot
-    op.povRight().whileTrue(distanceShot().repeatedly()
+    op.povRight().and(intake.getIntakeStopSensor()).whileTrue(distanceShot().repeatedly()
         .alongWith(intake.intakeOff()));
 
-    // Controls if the Robotic Pathing will drive to the speaker or amp
-    op.leftBumper().onTrue(runOnce(() -> SmartDashboard.putBoolean("speaker", true)));
-    op.rightBumper().onTrue(runOnce(() -> SmartDashboard.putBoolean("speaker", false)));
+    // Manually increases the shooter speed.  Needs to be done each time.
+    op.leftBumper().onTrue(shooter.relativeSpeedChange(-10.0));
+    op.rightBumper().onTrue(shooter.relativeSpeedChange(10.0));
 
     // Change angle manually
     op.leftTrigger().onTrue(arm.relativeAngleChange(-1.0));
     op.rightTrigger().onTrue(arm.relativeAngleChange(1.0));
 
-    op.back().onTrue(shooter.relativeSpeedChange(-10.0));
-    op.start().onTrue(shooter.relativeSpeedChange(10.0));
+    op.back().onTrue(arm.setClimbPosition());
+    op.start().onTrue(climb.climb());
 
     // TRIGGERS==================================================================
     // When a note is detected by the camera near the intake turn the lights green
@@ -492,7 +493,7 @@ public class RobotContainer {
     return new Translation2d(x, y);
   }
 
-  public void setLEDs() {
+/*   public void setLEDs() {
     if (DriverStation.isDisabled()) {
       lights.rainbow();
     } else {
@@ -514,7 +515,7 @@ public class RobotContainer {
         }
       }
     }
-  }
+  } */
 
   public void createIntakeTrigger() {
     // Turn the intake off whenever the note gets to the sensor

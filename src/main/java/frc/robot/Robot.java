@@ -37,7 +37,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     m_robotContainer.getSpeakerDistance();
-    m_robotContainer.setLEDs();
+    //m_robotContainer.setLEDs();
   }
 
   @Override

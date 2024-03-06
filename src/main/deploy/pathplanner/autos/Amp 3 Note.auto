@@ -42,9 +42,33 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "findNote"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "Amp C1 to C2"
+            "pathName": "AmpFind to AmpShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AmpShoot to AmpFind"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "findNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AmpFind to AmpShoot"
           }
         }
       ]

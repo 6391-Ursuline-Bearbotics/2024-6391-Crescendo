@@ -58,6 +58,18 @@
           "data": {
             "pathName": "Center to Mid2"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "findNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AmpFind to AmpShoot"
+          }
         }
       ]
     }
