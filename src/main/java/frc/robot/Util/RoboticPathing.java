@@ -12,7 +12,7 @@ import frc.robot.generated.TunerConstants;
 
 public class RoboticPathing {
   // Load the path we want to pathfind to and follow
-  public PathPlannerPath topPath = PathPlannerPath.fromPathFile("Top to Amp");
+/*   public PathPlannerPath topPath = PathPlannerPath.fromPathFile("Top to Amp");
   public PathPlannerPath midPath = PathPlannerPath.fromPathFile("Mid to Amp");
   public PathPlannerPath botPath = PathPlannerPath.fromPathFile("Bot to Amp");
   public PathPlannerPath topSource = PathPlannerPath.fromPathFile("Top Source");
@@ -20,7 +20,7 @@ public class RoboticPathing {
   public PathPlannerPath botSource = PathPlannerPath.fromPathFile("Bot Source");
   public PathPlannerPath topSpeaker = PathPlannerPath.fromPathFile("Top Speaker");
   public PathPlannerPath midSpeaker = PathPlannerPath.fromPathFile("Mid Speaker");
-  public PathPlannerPath botSpeaker = PathPlannerPath.fromPathFile("Bot Speaker");
+  public PathPlannerPath botSpeaker = PathPlannerPath.fromPathFile("Bot Speaker"); */
 
   public Pose2d blueAmp = new Pose2d(1.85, 7.72, new Rotation2d(Units.degreesToRadians(-90)));
 
@@ -29,7 +29,7 @@ public class RoboticPathing {
           TunerConstants.kSpeedAt12VoltsMps, 4.0,
           Math.PI * 1.5, Units.degreesToRadians(720));
 
-  // Since AutoBuilder is configured, we can use it to build pathfinding commands
+/*   // Since AutoBuilder is configured, we can use it to build pathfinding commands
   public Command TopAmpRobotic = AutoBuilder.pathfindThenFollowPath(
           topPath,
           constraints,
@@ -82,7 +82,7 @@ public class RoboticPathing {
           botSource,
           constraints,
           0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-  );
+  ); */
 
   public Command pathToAmp = AutoBuilder.pathfindToPoseFlipped(blueAmp, constraints);
 }
