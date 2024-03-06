@@ -174,7 +174,7 @@ public class Arm extends SubsystemBase {
    * @return Command thats sets the trapezoid profile goal for the arm subsystem
    */
   public Command setArmGoalCommand(double goal) {
-    return runOnce(() -> setGoal(goal));
+    return runOnce(() -> setGoal(Math.min(goal, 100)));
   }
 
   /**
