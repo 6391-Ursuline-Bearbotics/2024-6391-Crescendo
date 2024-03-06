@@ -40,7 +40,7 @@ public class Arm extends SubsystemBase {
   private static final double intakePosition = -2;
   private static final double storePosition = 18;
   private static final double climbPosition = 60.0;
-  private static final double ampPosition = 90.0;
+  private static final double ampPosition = 92.0;
 
   // Arm Contraints
   private static final double kMaxVelocityRadPerSecond = Math.PI / 2; // 90deg per second
