@@ -68,7 +68,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AmpFind to AmpShoot"
+            "pathName": "AmpPickup to AmpShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armAutoAndShoot"
           }
         }
       ]

@@ -38,7 +38,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Amp to C1"
+            "pathName": "AmpStart to AmpFind"
           }
         },
         {
@@ -50,7 +50,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AmpFind to AmpShoot"
+            "pathName": "AmpPickup to AmpShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armAutoAndShoot"
           }
         },
         {
@@ -68,7 +74,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AmpFind to AmpShoot"
+            "pathName": "AmpPickup to AmpShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armAutoAndShoot"
           }
         }
       ]

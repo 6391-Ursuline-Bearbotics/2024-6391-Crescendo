@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.443366039371165,
-        "y": 6.604911811820771
+        "x": 7.754874702574518,
+        "y": 6.690760646095283
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.890680610638521,
-        "y": 6.33661376195999
+        "x": 5.2423882426240205,
+        "y": 6.506695703974367
       },
       "isLocked": false,
-      "linkedName": "AmpFind"
+      "linkedName": "AmpPickup"
     },
     {
       "anchor": {
@@ -30,42 +30,7 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 1.5,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "shoot"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Arm to Shoot",
-      "waypointRelativePos": 0.7,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "armAutoShootPosition"
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,

@@ -222,9 +222,6 @@ public class RobotContainer {
     drv.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative(
         new Pose2d(drivetrain.getState().Pose.getTranslation(), drivetrain.getOperatorPerspective()))));
 
-    // Drives to the game piece using turn, it will not strafe
-    drv.back().whileTrue(findNote);
-
     // Turtle Mode toggle
     drv.leftBumper().onTrue(either(
         runOnce(() -> MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * TurtleSpeed)

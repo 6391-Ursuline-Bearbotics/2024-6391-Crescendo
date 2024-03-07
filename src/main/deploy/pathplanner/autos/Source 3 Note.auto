@@ -38,19 +38,49 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SourceStart to SourceShoot"
+            "pathName": "SourceStart to SourceFind"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "findNote"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SourceShoot to C4"
+            "pathName": "SourcePickup to SourceShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armAutoAndShoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Source to C5"
+            "pathName": "SourceShoot to SourceFind"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "findNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SourcePickup to SourceShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armAutoAndShoot"
           }
         }
       ]
