@@ -38,7 +38,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Center to 1"
+            "pathName": "Center to 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armSubShootPosition"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.6
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
           }
         },
         {
@@ -48,9 +66,33 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "armSubShootPosition"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.6
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "Center to 3"
+            "pathName": "Center to 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
           }
         },
         {

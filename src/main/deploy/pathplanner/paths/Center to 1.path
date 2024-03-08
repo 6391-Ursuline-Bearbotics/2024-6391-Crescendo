@@ -48,7 +48,7 @@
     {
       "waypointRelativePos": 1.0,
       "rotationDegrees": 47.91083782616769,
-      "rotateFast": true
+      "rotateFast": false
     }
   ],
   "constraintZones": [],
@@ -93,23 +93,6 @@
               "type": "named",
               "data": {
                 "name": "shooterAutoSpeed"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 2.0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "shoot"
               }
             }
           ]

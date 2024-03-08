@@ -74,9 +74,9 @@ public class DriveToGamePiece extends Command {
 
       // If the note is close then we need to drop the intake before we approach it.
       // Before we do any of that we need to also verify that we are aligned to it
-      if (vert < -14) {
+      if (vert < -7) {
         if (thetaController.atSetpoint()) {
-          if (intakeTimer.hasElapsed(2)) {
+          if (intakeTimer.hasElapsed(0.5)) {
             intake.schedule();
             intakeTimer.reset();
           }
@@ -85,7 +85,7 @@ public class DriveToGamePiece extends Command {
           xScaled = 0.0;
         }
       } else {
-        xScaled = xOutput + Math.max((vert + 14) * 0.04, 0); // speed scale
+        xScaled = xOutput + Math.max((vert + 14) * 0.01, 0); // speed scale
       }
 		} else {
       // Normally stop unless we just put down the intake then drive for 1.5 second, drive straight

@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4081070034867342,
-        "y": 5.513288844759509
+        "x": 1.7651438387099796,
+        "y": 5.502078857064002
       },
       "isLocked": false,
       "linkedName": "CenterStart"
     },
     {
       "anchor": {
-        "x": 2.4,
-        "y": 5.513288844759509
+        "x": 2.3981263620890236,
+        "y": 5.65788993974192
       },
       "prevControl": {
-        "x": 1.9241425080543864,
-        "y": 5.513288844759509
+        "x": 1.92226887014341,
+        "y": 5.65788993974192
       },
       "nextControl": {
-        "x": 2.878047031845093,
-        "y": 5.513288844759509
+        "x": 2.8761733939341165,
+        "y": 5.65788993974192
       },
       "isLocked": false,
       "linkedName": null
@@ -36,8 +36,8 @@
         "y": 5.513288844759509
       },
       "prevControl": {
-        "x": 2.8100684079450238,
-        "y": 5.510600915587749
+        "x": 1.7067146827057598,
+        "y": 5.52155524239874
       },
       "nextControl": null,
       "isLocked": false,
@@ -64,40 +64,6 @@
               "type": "named",
               "data": {
                 "name": "intakeOn"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "After Intake",
-      "waypointRelativePos": 1.0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "armSubShootPosition"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 2.0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "shoot"
               }
             }
           ]

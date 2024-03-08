@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 2.410669293610502,
-        "y": 4.493818790857619
+        "x": 2.378649976754284,
+        "y": 4.53799778299438
       },
       "prevControl": {
-        "x": 2.035050127188097,
-        "y": 4.785967031408379
+        "x": 2.003030810331879,
+        "y": 4.830146023545141
       },
       "nextControl": {
-        "x": 2.6750115754256556,
-        "y": 4.288219238334721
+        "x": 2.6429922585694374,
+        "y": 4.332398230471482
       },
       "isLocked": false,
       "linkedName": null
@@ -48,7 +48,7 @@
     {
       "waypointRelativePos": 1,
       "rotationDegrees": -41.98721249581657,
-      "rotateFast": true
+      "rotateFast": false
     }
   ],
   "constraintZones": [],
@@ -70,40 +70,6 @@
               "type": "named",
               "data": {
                 "name": "intakeOn"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "After Intake",
-      "waypointRelativePos": 1.0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "armSubShootPosition"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 2.0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "shoot"
               }
             }
           ]
