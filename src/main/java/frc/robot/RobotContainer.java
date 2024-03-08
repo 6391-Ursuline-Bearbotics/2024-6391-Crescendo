@@ -114,12 +114,12 @@ public class RobotContainer {
     shooterCamera = new Limelight(drivetrain, "limelight-tag");
     findNote = new DriveToGamePiece(drivetrain, intakeCamera, arm.setIntakePosition().andThen(intake.intakeOn()), arm)
         .until(() -> SmartDashboard.getBoolean("noteLoaded", false))
-        .withTimeout(3)
+        .withTimeout(5)
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)));
 
     autofindNote = new DriveToGamePiece(drivetrain, intakeCamera, arm.setIntakePosition().andThen(intake.intakeAutoStop()), arm)
         .until(() -> intake.getIntakeStopSensor().getAsBoolean())
-        .withTimeout(3);
+        .withTimeout(5);
 
     autoAim.HeadingController.setPID(3.0, 0.0, 0.5);
     autoAim.HeadingController.enableContinuousInput(-Math.PI, Math.PI);

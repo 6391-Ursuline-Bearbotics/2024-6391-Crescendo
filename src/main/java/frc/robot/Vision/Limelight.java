@@ -61,8 +61,6 @@ public class Limelight extends SubsystemBase {
       confidence = 0; // If we don't update confidence then we don't send the measurement
       LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(ll);
       SmartDashboard.putNumber("NumTags", limelightMeasurement.tagCount);
-      // We are publishing this to view as a ghost to try and help determine when not to use the LL measurements
-      publishToField(limelightMeasurement);
 
       // No tag found so check no further or pose not within field boundary
       if(limelightMeasurement.tagCount >= 1 && fieldBoundary.isPoseWithinArea(limelightMeasurement.pose)) {
@@ -74,9 +72,18 @@ public class Limelight extends SubsystemBase {
                 confidence = 0.2;
                 trust = false;
           } else {
+            // High trust level anything less than this we shouldn't bother with
             compareDistance = limelightMeasurement.pose.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
-            if( compareDistance < 0.5) {
-              confidence = 0.7;
+            if( compareDistance < 0.5 ||
+            (limelightMeasurement.tagCount >= 2 && limelightMeasurement.avgTagDist < Units.feetToMeters(20)) ||
+            (limelightMeasurement.tagCount == 1 && limelightMeasurement.avgTagDist < Units.feetToMeters(10))) {
+              double tagDistance = Units.metersToFeet(limelightMeasurement.avgTagDist);
+              // Double the distance for solo tag
+              if (limelightMeasurement.tagCount == 1) {
+                tagDistance = tagDistance * 2;
+              }
+              // Add up to .2 confidence depending on how far away
+              confidence = 0.7 + (tagDistance / 10);
             }
           }
         }
@@ -87,6 +94,8 @@ public class Limelight extends SubsystemBase {
 
   private void addPose(LimelightHelpers.PoseEstimate limelightMeasurement, double confide) {
     if(confide > 0) {
+      // We are publishing this to view as a ghost to try and help determine when not to use the LL measurements
+      publishToField(limelightMeasurement);
       SmartDashboard.putBoolean("PoseUpdate", true);
       SmartDashboard.putNumber("LLConfidence", confide);
       drivetrain.addVisionMeasurement(
@@ -95,6 +104,8 @@ public class Limelight extends SubsystemBase {
           VecBuilder.fill(confide, confide, 99));
     } else {
       SmartDashboard.putBoolean("PoseUpdate", false);
+      // We are publishing this to view as a ghost to try and help determine when not to use the LL measurements
+      publishToField(new LimelightHelpers.PoseEstimate(new Pose2d(), 0, 0, 0, 0, 0, 0));
     }
   }
 
