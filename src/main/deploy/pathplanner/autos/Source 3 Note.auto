@@ -38,19 +38,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SourceStart to SourceFind"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "findNote"
+            "pathName": "SourceStart to C4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SourcePickup to SourceShoot"
+            "pathName": "C4 to SourceStart"
           }
         },
         {
@@ -62,7 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SourceShoot to SourceFind"
+            "pathName": "SourceStart to SourceFind"
           }
         },
         {
