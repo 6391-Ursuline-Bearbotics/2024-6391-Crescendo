@@ -14,7 +14,7 @@ public class InterpolatingTable {
     public static final ShotParameter auto = new ShotParameter(27.0, 125); //was 28
     public static final ShotParameter stage = new ShotParameter(42.8, 200);
     public static final ShotParameter wing = new ShotParameter(48.2, 220);
-    public static final ShotParameter farwing = new ShotParameter(46.3, 150);
+    public static final ShotParameter farwing = new ShotParameter(36.3, 142);
 
     /* Private constructor because this is a utility class */
     private InterpolatingTable() {}

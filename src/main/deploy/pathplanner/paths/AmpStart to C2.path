@@ -8,29 +8,29 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7092550333211132,
-        "y": 8.42958165343494
+        "x": 3.361209251433185,
+        "y": 9.600652552998753
       },
       "isLocked": false,
       "linkedName": "AmpStart"
     },
     {
       "anchor": {
-        "x": 7.9781107604877315,
-        "y": 7.430241005199558
+        "x": 8.27025654051308,
+        "y": 5.774493730805644
       },
       "prevControl": {
-        "x": 5.485133437641035,
-        "y": 7.4399791978669265
+        "x": 5.777279217666383,
+        "y": 5.784231923473013
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "AmpFind"
+      "linkedName": "C2"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.4,
+      "waypointRelativePos": 0.3,
       "rotationDegrees": 0.0,
       "rotateFast": false
     }

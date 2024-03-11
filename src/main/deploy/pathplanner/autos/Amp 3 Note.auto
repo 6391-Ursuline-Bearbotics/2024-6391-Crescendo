@@ -42,12 +42,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "findNote"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "AmpPickup to AmpShoot"
@@ -62,25 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AmpShoot to AmpFind"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "findNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "AmpPickup to AmpShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "armAutoAndShoot"
+            "pathName": "AmpStart to C2"
           }
         }
       ]
