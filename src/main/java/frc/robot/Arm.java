@@ -78,10 +78,10 @@ public class Arm extends SubsystemBase {
     m_pidController = m_motor.getPIDController();
     m_pidController.setP(2);
     m_pidController.setI(0);
-    m_pidController.setD(.15);
+    m_pidController.setD(.5);
     m_pidController.setIZone(0);
     m_pidController.setFF(0);
-    m_pidController.setOutputRange(-0.2, 0.2);
+    m_pidController.setOutputRange(-0.12, 0.25); //allowed output of arm
     m_pidController.setFeedbackDevice(m_absoluteEncoder);
 
     m_motor.burnFlash();
@@ -174,7 +174,7 @@ public class Arm extends SubsystemBase {
    * @return Command thats sets the trapezoid profile goal for the arm subsystem
    */
   public Command setArmGoalCommand(double goal) {
-    return runOnce(() -> setGoal(Math.min(goal, 100)));
+    return runOnce(() -> setGoal(goal));
   }
 
   /**
@@ -183,7 +183,7 @@ public class Arm extends SubsystemBase {
    * @param goal The goal position for the arm's motion profile.  In degrees
    */
   public final void setGoal(double goal) {
-    m_goal = new TrapezoidProfile.State(goal / 120.0, 0);
+    m_goal = new TrapezoidProfile.State(Math.min(goal, 100) / 120.0, 0);
   }
 
   public Command quasistaticForward() {

@@ -20,7 +20,7 @@ public class Intake extends SubsystemBase {
   private CANSparkMax m_motor;
 
   private static final double intakeSpeed = 0.9;
-  private static final double intakeSlowSpeed = 0.2; // Minimum speed required to move the note
+  private static final double intakeSlowSpeed = 0.15; // Minimum speed required to move the note
   private DigitalInput noteSlowSensor = new DigitalInput(intakeSlowSensorPort);
   private DigitalInput noteStopSensor = new DigitalInput(intakeStopSensorPort);
 
