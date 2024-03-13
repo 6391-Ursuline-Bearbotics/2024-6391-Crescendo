@@ -50,7 +50,8 @@ public class DriveToGamePiece extends Command {
     thetaController.reset();
     thetaController.setTolerance(Units.degreesToRadians(4));
     intakeTimer.start();
-    arm.setStorePosition();
+    blindTimer.start();
+    arm.setStorePosition().schedule();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -58,19 +59,14 @@ public class DriveToGamePiece extends Command {
   public void execute() {
 		if (ll.hasTarget()){ // || distanceTimer.hasElapsed(convertVertToTime(ll.getNoteVertical()))
       vert = ll.getNoteVertical();
-      blindTimer.start();
       blindTimer.reset();
 
       // Setpoint is the current robot rotation with additional robot relative LL reading
       setpoint = Math.toRadians(-ll.getNoteHorizontal())+ drivetrain.getState().Pose.getRotation().getRadians();
       SmartDashboard.putNumber("Game Piece setpoint", setpoint);
 			thetaController.setSetpoint(setpoint);
-//      if (!thetaController.atSetpoint() ){
-				thetaOutput = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);
-        SmartDashboard.putNumber("theta output", thetaOutput);
-//			} else {
-//        thetaOutput = 0;
-//      }
+      thetaOutput = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);
+      SmartDashboard.putNumber("theta output", thetaOutput);
 
       // If the note is close then we need to drop the intake before we approach it.
       // Before we do any of that we need to also verify that we are aligned to it

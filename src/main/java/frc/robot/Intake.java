@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -41,13 +42,13 @@ public class Intake extends SubsystemBase {
 
   // This is a command for whatever process should take place after the first sensor is tripped
   public Command intakeSlow() {
-    return run(() -> m_motor.setVoltage(intakeSlowSpeed * 12)).until(() -> !noteStopSensor.get())
+    return new RunCommand(() -> m_motor.setVoltage(intakeSlowSpeed * 12)).until(() -> !noteStopSensor.get())
         .withTimeout(1.0).andThen(intakeOff());
   }
 
   // This starts the intake then stops it after 2.5 seconds or if a note is detected
   public Command intakeAutoStop() {
-    return run(() -> m_motor.setVoltage(intakeSpeed * 12)).until(() -> !noteSlowSensor.get())
+    return new RunCommand(() -> m_motor.setVoltage(intakeSpeed * 12)).until(() -> !noteSlowSensor.get())
         .withTimeout(2.5).andThen(intakeSlow());
   }
 
@@ -66,5 +67,9 @@ public class Intake extends SubsystemBase {
 
   public Trigger getIntakeStopSensor() {
     return new Trigger(() -> !noteStopSensor.get());
+  }
+
+  public Boolean getIntakeStop() {
+    return !noteStopSensor.get();
   }
 }

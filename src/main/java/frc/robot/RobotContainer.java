@@ -118,7 +118,7 @@ public class RobotContainer {
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)));
 
     autofindNote = new DriveToGamePiece(drivetrain, intakeCamera, arm.setIntakePosition().andThen(intake.intakeAutoStop()), arm)
-        .until(() -> intake.getIntakeStopSensor().getAsBoolean())
+        .until(() -> intake.getIntakeStop())
         .withTimeout(5);
 
     autoAim.HeadingController.setPID(3.0, 0.0, 0.5);
