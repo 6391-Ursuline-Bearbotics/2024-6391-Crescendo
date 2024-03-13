@@ -8,7 +8,6 @@ import org.littletonrobotics.urcl.URCL;
 
 import com.ctre.phoenix6.SignalLogger;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -53,7 +52,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     SmartDashboard.putString("AutoAlliance", DriverStation.getAlliance().toString());
 
-    //m_robotContainer.intakeCamera.setPipeline(1);
+    m_robotContainer.shooterCamera.useLimelight(false);
     stopAll();
 
     // Allows the simulation sensor to work on the proper side of the field
@@ -76,7 +75,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     SmartDashboard.putString("TeleopAlliance", DriverStation.getAlliance().toString());
 
-    //m_robotContainer.intakeCamera.setPipeline(1);
+    m_robotContainer.shooterCamera.useLimelight(true);
     stopAll();
     m_robotContainer.createIntakeTrigger();
 

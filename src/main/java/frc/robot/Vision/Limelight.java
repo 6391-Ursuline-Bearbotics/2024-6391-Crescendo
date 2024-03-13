@@ -9,15 +9,12 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,8 +26,6 @@ public class Limelight extends SubsystemBase {
   private String ll = "limelight";
   private Boolean enable = true;
   private Boolean trust = false;
-  private int fieldError = 0;
-  private int distanceError = 0;
   private double confidence = 0;
   private double compareDistance;
 
@@ -47,7 +42,7 @@ public class Limelight extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if ((enable || DriverStation.isDisabled()) && !RobotBase.isSimulation() && !DriverStation.isAutonomous()) {
+    if ((enable || DriverStation.isDisabled()) && !RobotBase.isSimulation()) {
       // How to test:
       // Odometry is good on a nice flat surface so when testing on flat assume odometry as ground truth
       // Log over the last 5? seconds what has been the avg distance between odometry and the LL pose
@@ -83,7 +78,7 @@ public class Limelight extends SubsystemBase {
                 tagDistance = tagDistance * 2;
               }
               // Add up to .2 confidence depending on how far away
-              confidence = 0.7 + (tagDistance / 10);
+              confidence = 0.7 + (tagDistance / 100);
             }
           }
         }

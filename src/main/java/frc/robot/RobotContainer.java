@@ -69,7 +69,7 @@ public class RobotContainer {
   // Starting the other subsystems
   //private final LEDSubsystem lights = new LEDSubsystem();
   public final Detector intakeCamera = new Detector("limelight-note");
-  private final Limelight shooterCamera;
+  public final Limelight shooterCamera;
   public final Arm arm = new Arm();
   public final Shooter shooter = new Shooter();
   public final Intake intake = new Intake();
@@ -140,6 +140,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("intakeOn", intake.intakeAutoStop());
     NamedCommands.registerCommand("armAutoAndShoot", armAutoAndShoot());
     NamedCommands.registerCommand("findNote", autofindNote);
+    NamedCommands.registerCommand("enableCamera", runOnce(() -> shooterCamera.useLimelight(true)));
     drivetrain.configurePathPlanner();
     robo = new RoboticPathing();
 
