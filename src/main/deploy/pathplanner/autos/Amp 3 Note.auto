@@ -38,13 +38,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AmpStart to AmpFind"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "AmpPickup to AmpShoot"
+            "pathName": "AmpStart to C2"
           }
         },
         {
@@ -56,7 +50,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AmpStart to C2"
+            "pathName": "AmpPickup to AmpShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AmpStart to AmpFind"
           }
         }
       ]

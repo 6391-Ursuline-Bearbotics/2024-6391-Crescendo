@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.3833562123671674,
-        "y": 6.837639753031757
+        "x": 3.629580926424823,
+        "y": 6.10924384639467
       },
       "isLocked": false,
       "linkedName": "AmpFind"
     },
     {
       "anchor": {
-        "x": 0.74,
-        "y": 6.579185680732721
+        "x": 1.27,
+        "y": 5.513288844759509
       },
       "prevControl": {
-        "x": 1.356139746680443,
-        "y": 8.443013042609715
+        "x": 3.629580926424823,
+        "y": 6.10924384639467
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "AmpStart"
+      "linkedName": "CenterStart"
     }
   ],
   "rotationTargets": [
@@ -63,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 60.0,
+    "rotation": 0.0,
     "rotateFast": false
   },
   "reversed": false,
