@@ -38,7 +38,7 @@ public class Arm extends SubsystemBase {
   private SysIdRoutine sysIdRoutine;
 
   // Arm setpoints in degrees
-  private static final double intakePosition = -3.4;
+  private static final double intakePosition = -3.9;
   private static final double storePosition = 18;
   private static final double climbPosition = 60.0;
   private static final double ampPosition = 92.0;
@@ -47,7 +47,7 @@ public class Arm extends SubsystemBase {
   private static final double kMaxVelocityRadPerSecond = Math.PI / 2; // 90deg per second
   private static final double kMaxAccelerationRadPerSecSquared = Math.PI;
   // The value (inverted) when measured parallel to the ground making it 0
-  private static final double kArmOffsetRads = 0.668;
+  private static final double kArmOffsetRads = 0.5414; // .668
 
   // Profile Setup
   private final TrapezoidProfile m_profile;
