@@ -1,0 +1,127 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.2736970928487312,
+      "y": 5.513288844759509
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "shooterSubSpeed"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armSubShootPosition"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Center to 3 No Rotate"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armSubShootPosition"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.6
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Center to 2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armSubShootPosition"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.6
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Center to 1 No Rotate"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Center to Mid2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "findNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AmpPickup to AmpShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armAutoAndShoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
