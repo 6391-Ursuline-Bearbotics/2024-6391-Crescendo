@@ -11,9 +11,9 @@ import static java.util.Map.entry;
 // Interpolating table
 public class InterpolatingTable {
     public static final ShotParameter sub = new ShotParameter(10.0, 125); //8.0 100
-    public static final ShotParameter auto = new ShotParameter(31.0, 125); //27
-    public static final ShotParameter stage = new ShotParameter(44.5, 200); //42
-    public static final ShotParameter wing = new ShotParameter(50.2, 220); // 48.2
+    public static final ShotParameter auto = new ShotParameter(31.0, 140); //27
+    public static final ShotParameter stage = new ShotParameter(43.5, 200); //42
+    public static final ShotParameter wing = new ShotParameter(49.2, 220); // 48.2
     public static final ShotParameter farwing = new ShotParameter(38.3, 142); //36.3
 
     /* Private constructor because this is a utility class */
@@ -24,8 +24,8 @@ public class InterpolatingTable {
         Map.ofEntries(
             entry(1.20, sub),
             entry(2.21, auto),
-            entry(3.38, stage),
-            entry(5.095, wing),
+            entry(3.3, stage),
+            entry(6.24, wing),
             entry(10.18, farwing)
         )
     );
