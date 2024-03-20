@@ -12,7 +12,7 @@ import static java.util.Map.entry;
 public class InterpolatingTable {
     public static final ShotParameter sub = new ShotParameter(11, 125); //8.0 100
     public static final ShotParameter auto = new ShotParameter(31.2, 140); //27
-    public static final ShotParameter stage = new ShotParameter(41.5, 200); //42
+    public static final ShotParameter stage = new ShotParameter(42.5, 200); //42
     public static final ShotParameter wing = new ShotParameter(53, 220); // 48.2
     public static final ShotParameter farwing = new ShotParameter(38.3, 142); //36.3
 
