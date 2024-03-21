@@ -10,11 +10,11 @@ import static java.util.Map.entry;
 
 // Interpolating table
 public class InterpolatingTable {
-    public static final ShotParameter sub = new ShotParameter(11, 125); //8.0 100
-    public static final ShotParameter auto = new ShotParameter(31.2, 140); //27
-    public static final ShotParameter stage = new ShotParameter(42.5, 200); //42
-    public static final ShotParameter wing = new ShotParameter(53, 220); // 48.2
-    public static final ShotParameter farwing = new ShotParameter(38.3, 142); //36.3
+    public static final ShotParameter sub = new ShotParameter(11, 125); //11 125
+    public static final ShotParameter auto = new ShotParameter(31.2, 140); //31.2 140
+    public static final ShotParameter stage = new ShotParameter(42.5, 200); //42.5 200
+    public static final ShotParameter wing = new ShotParameter(53, 220); // 53 220
+    public static final ShotParameter farwing = new ShotParameter(38.3, 142); //38.3 142
 
     /* Private constructor because this is a utility class */
     private InterpolatingTable() {}
@@ -22,11 +22,11 @@ public class InterpolatingTable {
     // Interpolating tree map
     private static final TreeMap<Double, ShotParameter> map = new TreeMap<>(
         Map.ofEntries(
-            entry(1.15, sub),
-            entry(2.08, auto),
-            entry(3.39, stage),
-            entry(6.20, wing),
-            entry(10.18, farwing)
+            entry(1.19, sub), // 1.15
+            entry(2.12, auto), // 2.08
+            entry(3.36, stage), // 3.39
+            entry(6.20, wing), // 6.2
+            entry(10.18, farwing) // 10.18
         )
     );
 
