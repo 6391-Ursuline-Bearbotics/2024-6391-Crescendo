@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7328954159687686,
-      "y": 4.4600922416554205
+      "x": 1.32,
+      "y": 5.513288844759509
     },
-    "rotation": -60.0
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
@@ -38,13 +38,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SourceStart to C4"
+            "pathName": "Center to 3 No Rotate"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C4 to SourceStart"
+            "pathName": "Center to 2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Center to 1"
           }
         },
         {
@@ -56,7 +74,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SourceStart to SourceFind"
+            "pathName": "Center to Mid2"
           }
         },
         {
@@ -68,13 +86,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SourcePickup to SourceShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "armAutoAndShoot"
+            "pathName": "AmpPickup to Center"
           }
         }
       ]
