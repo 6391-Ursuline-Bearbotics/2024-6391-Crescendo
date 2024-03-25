@@ -16,19 +16,25 @@
     },
     {
       "anchor": {
-        "x": 8.036039809597451,
-        "y": 2.459275674614116
+        "x": 8.104707265167793,
+        "y": 2.4053335888403695
       },
       "prevControl": {
-        "x": 4.452523826588308,
-        "y": 2.634938222800839
+        "x": 4.861889106933612,
+        "y": 1.8892093774697645
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "C4"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [
     {

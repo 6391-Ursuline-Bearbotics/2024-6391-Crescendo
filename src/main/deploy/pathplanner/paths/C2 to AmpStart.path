@@ -3,37 +3,43 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.104707265167793,
-        "y": 2.4053335888403695
+        "x": 8.27025654051308,
+        "y": 5.774493730805644
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.0878903299647344,
-        "y": 0.941479020617682
+        "x": 5.3390605476347375,
+        "y": 7.936627023906479
       },
       "isLocked": false,
-      "linkedName": "C4"
+      "linkedName": "C2"
     },
     {
       "anchor": {
-        "x": 0.7328954159687686,
-        "y": 4.4600922416554205
+        "x": 0.74,
+        "y": 6.579185680732721
       },
       "prevControl": {
-        "x": 3.632765268383603,
-        "y": 2.8340224440791246
+        "x": 1.356139746680443,
+        "y": 8.443013042609715
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "SourceStart"
+      "linkedName": "AmpStart"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Enable Camera",
-      "waypointRelativePos": 0.4,
+      "name": "EnableCamera",
+      "waypointRelativePos": 0.35,
       "command": {
         "type": "parallel",
         "data": {
@@ -56,8 +62,8 @@
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -60.0,
+    "velocity": 0,
+    "rotation": 60.0,
     "rotateFast": false
   },
   "reversed": false,

@@ -42,6 +42,12 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "C2 to AmpStart"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "armAutoAndShoot"
