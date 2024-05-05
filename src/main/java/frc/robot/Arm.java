@@ -38,7 +38,7 @@ public class Arm extends SubsystemBase {
   private SysIdRoutine sysIdRoutine;
 
   // Arm setpoints in degrees
-  private static final double intakePosition = -3.9;
+  private static final double intakePosition = 0.0;
   private static final double storePosition = 18;
   private static final double climbPosition = 60.0;
   private static final double ampPosition = 92.0;
@@ -47,7 +47,7 @@ public class Arm extends SubsystemBase {
   private static final double kMaxVelocityRadPerSecond = Math.PI / 2; // 90deg per second
   private static final double kMaxAccelerationRadPerSecSquared = Math.PI;
   // The value (inverted) when measured parallel to the ground making it 0
-  private static final double kArmOffsetRads = 0.5414; // .668
+  private static final double kArmOffsetRads = 0.028; // .668
 
   // Profile Setup
   private final TrapezoidProfile m_profile;
@@ -99,7 +99,7 @@ public class Arm extends SubsystemBase {
 
     m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
         kMaxVelocityRadPerSecond, kMaxAccelerationRadPerSecSquared));
-    double initialPosition = m_absoluteEncoder.getPosition();
+    double initialPosition = removeWrap(m_absoluteEncoder.getPosition(), storePosition - 2);
     m_state = new TrapezoidProfile.State(initialPosition, 0);
     m_goal = new TrapezoidProfile.State(initialPosition, 0);
   }
@@ -115,20 +115,28 @@ public class Arm extends SubsystemBase {
 
     if (!disabled) {
       // Update the Trapezoid profile
-      m_state = m_profile.calculate(0.02, m_goal, m_state);
+      m_state = m_profile.calculate(0.02, m_state, m_goal);
       // Calculate the "feedforward" from the current angle turning it into a form of feedback
-      position = m_absoluteEncoder.getPosition();
+      position = removeWrap(m_absoluteEncoder.getPosition(), 0);
       SmartDashboard.putNumber("Arm Position", position * 120.0);
       SmartDashboard.putNumber("Arm Setpoint", m_state.position * 120.0);
       SmartDashboard.putNumber("Arm Current", m_motor.getOutputCurrent());
-      double feedforward = m_armFF.calculate(position * 2 * Math.PI, m_state.velocity);
+      double feedforward = m_armFF.calculate(position * 2 * Math.PI / 3, m_state.velocity);
       // Add the feedforward to the PID output to get the motor output
       m_pidController.setReference(m_state.position, ControlType.kPosition, 0, feedforward);
     }
   }
 
+  private double removeWrap(double value, double deadzone) {
+    if (value > 0.9 || value < deadzone) {
+      return 0.0;
+    } else {
+      return value;
+    }
+  }
+
   public Command setCurrentPosition() {
-    return setArmGoalCommand(position);
+    return setArmGoalCommand(position * 120.0);
   }
 
   public Command setIntakePosition() {
