@@ -115,20 +115,20 @@ public class Arm extends SubsystemBase {
 
     if (!disabled) {
       // Update the Trapezoid profile
-      m_state = m_profile.calculate(0.02, m_goal, m_state);
-      // Calculate the "feedforward" from the current angle turning it into a form of feedback
+      m_state = m_profile.calculate(0.02, m_state, m_goal);
       position = m_absoluteEncoder.getPosition();
       SmartDashboard.putNumber("Arm Position", position * 120.0);
       SmartDashboard.putNumber("Arm Setpoint", m_state.position * 120.0);
       SmartDashboard.putNumber("Arm Current", m_motor.getOutputCurrent());
-      double feedforward = m_armFF.calculate(position * 2 * Math.PI, m_state.velocity);
+      // Calculate the "feedforward" from the current angle turning it into a form of feedback
+      double feedforward = m_armFF.calculate(position * 2 * Math.PI / 3, m_state.velocity);
       // Add the feedforward to the PID output to get the motor output
       m_pidController.setReference(m_state.position, ControlType.kPosition, 0, feedforward);
     }
   }
 
   public Command setCurrentPosition() {
-    return setArmGoalCommand(position);
+    return setArmGoalCommand(position * 120.0);
   }
 
   public Command setIntakePosition() {
