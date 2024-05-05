@@ -21,6 +21,9 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
+import edu.wpi.first.math.interpolation.Interpolator;
+import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -143,6 +146,12 @@ public class RobotContainer {
     NamedCommands.registerCommand("enableCamera", runOnce(() -> shooterCamera.useLimelight(true)));
     drivetrain.configurePathPlanner();
     robo = new RoboticPathing();
+
+    tmap.put(1.19, sub);
+    tmap.put(2.12, auto);
+    tmap.put(3.36, stage);
+    tmap.put(6.20, wing);
+    tmap.put(10.18, farwing);
 
     //PPHolonomicDriveController.setRotationTargetOverride(Optional.of(getSpeakerRotation()));
 
@@ -392,9 +401,28 @@ public class RobotContainer {
     return rotLimiter.calculate(MathUtil.applyDeadband(joystick, 0.05));
   }
 
+  public static final ShotParameter sub = new ShotParameter(11, 125); //11 125
+  public static final ShotParameter auto = new ShotParameter(31.2, 140); //31.2 140
+  public static final ShotParameter stage = new ShotParameter(42.5, 200); //42.5 200
+  public static final ShotParameter wing = new ShotParameter(53, 220); // 53 220
+  public static final ShotParameter farwing = new ShotParameter(38.3, 142); //38.3 142
+
+  public ShotParameter interpolate(ShotParameter startValue, ShotParameter endValue, Double t) {
+    return new ShotParameter(
+      lerp(startValue.angle, endValue.angle, t), 
+      lerp(startValue.rps, endValue.rps, t)
+    );
+  }
+
+  private double lerp(double y2, double y1, double t) {
+    return y1 + (t * (y2 - y1));
+  }
+
+  private InterpolatingTreeMap<Double, ShotParameter> tmap = new InterpolatingTreeMap<Double, ShotParameter>(InverseInterpolator.forDouble(), this::interpolate);
+
   private Command distanceShot() {
     return runOnce(() -> dist = SmartDashboard.getNumber("SpeakerDistance", 0))
-        .andThen(runOnce(() -> shot = InterpolatingTable.get(dist)))
+        .andThen(runOnce(() -> shot = tmap.get(dist)))
         .andThen(shooter.runOnce(() -> shooter.setRPS(shot.rps))
             .unless(() -> dist <= 0 || dist > 16.541)
             .alongWith(arm.runOnce(() -> arm.setGoal(shot.angle)))
