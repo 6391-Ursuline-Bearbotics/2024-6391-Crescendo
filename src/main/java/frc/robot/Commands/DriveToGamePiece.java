@@ -12,7 +12,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Arm;
 import frc.robot.CommandSwerveDrivetrain;
 import frc.robot.Vision.Detector;
 import frc.robot.generated.TunerConstants;
@@ -22,15 +21,11 @@ public class DriveToGamePiece extends Command {
 
   private Detector ll;
   private CommandSwerveDrivetrain drivetrain;
-  private Command intake;
-  private Arm arm;
   private PIDController thetaController = new PIDController(2.0, 0, 0.05);
-  public DriveToGamePiece(CommandSwerveDrivetrain drivetrain, Detector ll, Command intake, Arm arm) {
+  public DriveToGamePiece(CommandSwerveDrivetrain drivetrain, Detector ll) {
     addRequirements(drivetrain);
     this.drivetrain = drivetrain;
     this.ll = ll;
-    this.intake = intake;
-    this.arm = arm;
   }
   private final SwerveRequest.RobotCentric drive = new SwerveRequest.RobotCentric()
     //.withDeadband(TunerConstants.kSpeedAt12VoltsMps * 0.01).withRotationalDeadband(Constants.Drive.MaxAngularRate * 0.01)
@@ -39,7 +34,6 @@ public class DriveToGamePiece extends Command {
   private double xOutput = 0.2; // Minimum speed to drive towards note
   private final double yOutput = 0;
   private double setpoint = 0;
-  private Timer intakeTimer = new Timer();
   private Timer blindTimer = new Timer();
   private double vert = 0.0;
   private double xScaled = 0.0;
@@ -49,9 +43,7 @@ public class DriveToGamePiece extends Command {
   public void initialize() {
     thetaController.reset();
     thetaController.setTolerance(Units.degreesToRadians(4));
-    intakeTimer.start();
     blindTimer.start();
-    arm.setStorePosition().schedule();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -68,21 +60,7 @@ public class DriveToGamePiece extends Command {
       thetaOutput = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);
       SmartDashboard.putNumber("theta output", thetaOutput);
 
-      // If the note is close then we need to drop the intake before we approach it.
-      // Before we do any of that we need to also verify that we are aligned to it
-      if (vert < -10) {
-        if (thetaController.atSetpoint()) {
-          if (intakeTimer.hasElapsed(0.5)) {
-            intake.schedule();
-            intakeTimer.reset();
-          }
-          xScaled = xOutput;
-        } else {
-          xScaled = 0.0;
-        }
-      } else {
-        xScaled = xOutput + Math.max((vert + 14) * 0.02, 0); // speed scale
-      }
+      xScaled = xOutput + Math.max((vert + 14) * 0.02, 0); // speed scale
 		} else {
       // Normally stop unless we just put down the intake then drive for 1.5 second, drive straight
       thetaOutput = 0;
