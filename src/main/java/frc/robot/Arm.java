@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.Utils;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
@@ -11,6 +12,7 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -50,7 +52,7 @@ public class Arm extends SubsystemBase {
   private Boolean disabled = false;
   private Double position = 0.0;
   private SysIdRoutine sysIdRoutine;
-  private Encoder m_encoder = new Encoder(0, 1);
+  private Encoder m_encoder;
 
   // Arm setpoints in degrees
   private static final double intakePosition = -3.9;
@@ -96,18 +98,18 @@ public class Arm extends SubsystemBase {
           0,
           VecBuilder.fill(kArmEncoderDistPerPulse) // Add noise with a std-dev of 1 tick
           );
-  private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
+  private EncoderSim m_encoderSim;
 
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
   private final Mechanism2d m_mech2d = new Mechanism2d(60, 60);
-  private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
+  private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 15, 5);
   private final MechanismLigament2d m_armTower =
-      m_armPivot.append(new MechanismLigament2d("ArmTower", kArmLength, -90));
+      m_armPivot.append(new MechanismLigament2d("ArmTower", Units.metersToInches(kArmLength), -90));
   private final MechanismLigament2d m_arm =
       m_armPivot.append(
           new MechanismLigament2d(
               "Arm",
-              kArmLength,
+              Units.metersToInches(kArmLength),
               Units.radiansToDegrees(m_armSim.getAngleRads()),
               6,
               new Color8Bit(Color.kYellow)));
@@ -123,12 +125,12 @@ public class Arm extends SubsystemBase {
     //m_follower.setSmartCurrentLimit(50);
     m_motor.setInverted(true);
     m_motor.setIdleMode(IdleMode.kBrake);
+    m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
     m_follower.setIdleMode(IdleMode.kBrake);
     m_follower.follow(m_motor, true);
 
     // Get integrated NEO encoder
     m_relativeEncoder = m_motor.getEncoder();
-    m_encoder.setDistancePerPulse(kArmEncoderDistPerPulse);
 
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Arm Sim", m_mech2d);
@@ -166,6 +168,12 @@ public class Arm extends SubsystemBase {
     double initialPosition = removeWrap(m_absoluteEncoder.getPosition(), storePosition - 2);
     m_state = new TrapezoidProfile.State(initialPosition, 0);
     m_goal = new TrapezoidProfile.State(initialPosition, 0);
+
+    if (Utils.isSimulation()) {
+      m_encoder = new Encoder(7, 8);
+      m_encoderSim = new EncoderSim(m_encoder);
+      m_encoder.setDistancePerPulse(kArmEncoderDistPerPulse);
+    }
   }
 
   @Override
@@ -289,6 +297,7 @@ public class Arm extends SubsystemBase {
 
   /** Update the simulation model. */
   public void simulationPeriodic() {
+    
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
     m_armSim.setInput(m_motor.get() * RobotController.getBatteryVoltage());
