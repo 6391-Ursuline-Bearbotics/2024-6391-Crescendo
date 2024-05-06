@@ -25,6 +25,7 @@ public class Climber extends SubsystemBase {
     climbTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     climbTalonConfig.Voltage.PeakReverseVoltage = 0; // Never go in reverse
     m_climbMotor.setInverted(false);
+    m_climbMotor.optimizeBusUtilization();
     m_climbMotor.getConfigurator().apply(climbTalonConfig);
   }
 

@@ -31,7 +31,7 @@ public class Shooter extends SubsystemBase {
     m_shooterMotor.setInverted(false);
     m_shooterMotor.getConfigurator().apply(flywheelTalonConfig);
     m_shooterMotor2.getConfigurator().apply(flywheelTalonConfig);
-
+    m_shooterMotor2.optimizeBusUtilization();
     m_shooterMotor2.setControl(new Follower(3, false));
   }
 

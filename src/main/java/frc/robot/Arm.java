@@ -11,6 +11,7 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -38,16 +39,16 @@ public class Arm extends SubsystemBase {
   private SysIdRoutine sysIdRoutine;
 
   // Arm setpoints in degrees
-  private static final double intakePosition = -3.9;
+  private static final double intakePosition = 0.00; // -3.9
   private static final double storePosition = 18;
   private static final double climbPosition = 60.0;
   private static final double ampPosition = 92.0;
 
   // Arm Contraints
-  private static final double kMaxVelocityRadPerSecond = Math.PI / 2; // 90deg per second
-  private static final double kMaxAccelerationRadPerSecSquared = Math.PI;
+  private static final double kMaxVelocityRadPerSecond = Math.PI / 3; // 90deg per second
+  private static final double kMaxAccelerationRadPerSecSquared = Math.PI / 2  ;
   // The value (inverted) when measured parallel to the ground making it 0
-  private static final double kArmOffsetRads = 0.028; // .668
+  private static final double kArmOffsetRads = 0.022; //  .028
 
   // Profile Setup
   private final TrapezoidProfile m_profile;
@@ -65,6 +66,7 @@ public class Arm extends SubsystemBase {
     //m_follower.setSmartCurrentLimit(50);
     m_motor.setInverted(true);
     m_motor.setIdleMode(IdleMode.kBrake);
+    m_motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5,20); // set status 5 periodic to 20ms
     m_follower.setIdleMode(IdleMode.kBrake);
     m_follower.follow(m_motor, true);
 
@@ -77,12 +79,12 @@ public class Arm extends SubsystemBase {
 
     // Setting up the onboard PID controller on the SparkMAX
     m_pidController = m_motor.getPIDController();
-    m_pidController.setP(2);
-    m_pidController.setI(0);
-    m_pidController.setD(.5);
+    m_pidController.setP(.68); // 2
+    m_pidController.setI(0.000);
+    m_pidController.setD(0); //.5
     m_pidController.setIZone(0);
     m_pidController.setFF(0);
-    m_pidController.setOutputRange(-0.12, 0.25); //allowed output of arm
+//    m_pidController.setOutputRange(-0.12, 0.22); //allowed output of arm
     m_pidController.setFeedbackDevice(m_absoluteEncoder);
 
     m_motor.burnFlash();
@@ -95,7 +97,7 @@ public class Arm extends SubsystemBase {
                         null, // No log consumer, since data is recorded by URCL
                         this));
 
-    m_armFF = new ArmFeedforward(0, 1.4, 0);
+    m_armFF = new ArmFeedforward(.3, .55, 2.5); // kg .47 kv 4
 
     m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
         kMaxVelocityRadPerSecond, kMaxAccelerationRadPerSecSquared));
@@ -127,8 +129,12 @@ public class Arm extends SubsystemBase {
     }
   }
 
+//
+// We should set dead zones around expected ranges. if anything over 98, or anything below 17
+// we will never have a hold at this setpoint between auto / tele and these would be out-of bounds 
+//
   private double removeWrap(double value, double deadzone) {
-    if (value > 0.9 || value < deadzone) {
+    if (value > 0.9 || value < deadzone) { // make sure we do not get a non-zero value in the initial setpoint
       return 0.0;
     } else {
       return value;
