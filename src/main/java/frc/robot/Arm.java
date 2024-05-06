@@ -12,9 +12,23 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -36,6 +50,7 @@ public class Arm extends SubsystemBase {
   private Boolean disabled = false;
   private Double position = 0.0;
   private SysIdRoutine sysIdRoutine;
+  private Encoder m_encoder = new Encoder(0, 1);
 
   // Arm setpoints in degrees
   private static final double intakePosition = -3.9;
@@ -54,6 +69,49 @@ public class Arm extends SubsystemBase {
   private TrapezoidProfile.State m_state;
   private TrapezoidProfile.State m_goal;
 
+  
+  // distance per pulse = (angle per revolution) / (pulses per revolution)
+  //  = (2 * PI rads) / (Encoder only covers 120degrees) / (Throughbore absolute 1024 pulses)
+  public static final double kArmEncoderDistPerPulse = 2.0 * Math.PI / 3 / 1024;
+
+  // 25:1 and 64:24 sprocket to sprocket
+  public static final double kArmReduction = 25 * 64 / 24;
+  public static final double kArmMass = Units.lbsToKilograms(13); //?
+  public static final double kArmLength = Units.inchesToMeters(30); //? 
+  public static final double kMinAngleRads = Units.degreesToRadians(0);
+  public static final double kMaxAngleRads = Units.degreesToRadians(105); //?
+
+  // The arm gearbox represents a gearbox containing two Vex 775pro motors.
+  private final DCMotor m_armGearbox = DCMotor.getNEO(2);
+
+  private final SingleJointedArmSim m_armSim =
+      new SingleJointedArmSim(
+          m_armGearbox,
+          kArmReduction,
+          SingleJointedArmSim.estimateMOI(kArmLength, kArmMass),
+          kArmLength,
+          kMinAngleRads,
+          kMaxAngleRads,
+          true,
+          0,
+          VecBuilder.fill(kArmEncoderDistPerPulse) // Add noise with a std-dev of 1 tick
+          );
+  private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
+
+  // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
+  private final Mechanism2d m_mech2d = new Mechanism2d(60, 60);
+  private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
+  private final MechanismLigament2d m_armTower =
+      m_armPivot.append(new MechanismLigament2d("ArmTower", kArmLength, -90));
+  private final MechanismLigament2d m_arm =
+      m_armPivot.append(
+          new MechanismLigament2d(
+              "Arm",
+              kArmLength,
+              Units.radiansToDegrees(m_armSim.getAngleRads()),
+              6,
+              new Color8Bit(Color.kYellow)));
+
   /** Creates a new Arm. */
   public Arm() {
     // initialize 2 NEO in follower setup
@@ -70,6 +128,12 @@ public class Arm extends SubsystemBase {
 
     // Get integrated NEO encoder
     m_relativeEncoder = m_motor.getEncoder();
+    m_encoder.setDistancePerPulse(kArmEncoderDistPerPulse);
+
+    // Put Mechanism 2d to SmartDashboard
+    SmartDashboard.putData("Arm Sim", m_mech2d);
+    m_armTower.setColor(new Color8Bit(Color.kBlue));
+
     // REV Throughbore encoder hooked to SparkMAX using the Absolute Encoder Adapter
     m_absoluteEncoder = m_motor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
     m_absoluteEncoder.setInverted(true);
@@ -221,5 +285,24 @@ public class Arm extends SubsystemBase {
 
   public Command relativeAngleChange(double degrees) {
     return runOnce(() -> setGoal((m_goal.position * 120) + degrees));
+  }
+
+  /** Update the simulation model. */
+  public void simulationPeriodic() {
+    // In this method, we update our simulation of what our arm is doing
+    // First, we set our "inputs" (voltages)
+    m_armSim.setInput(m_motor.get() * RobotController.getBatteryVoltage());
+
+    // Next, we update it. The standard loop time is 20ms.
+    m_armSim.update(0.020);
+
+    // Finally, we set our simulated encoder's readings and simulated battery voltage
+    m_encoderSim.setDistance(m_armSim.getAngleRads());
+    // SimBattery estimates loaded battery voltages
+    RoboRioSim.setVInVoltage(
+        BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps()));
+
+    // Update the Mechanism Arm angle based on the simulated arm angle
+    m_arm.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
   }
 }
