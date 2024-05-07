@@ -126,6 +126,8 @@ public class RobotContainer {
     autoAim.HeadingController.setTolerance(Units.degreesToRadians(1));
 
     // Create PathPlanner Named Commands for use in Autos
+    drivetrain.configurePathPlanner();
+    robo = new RoboticPathing();
     NamedCommands.registerCommand("shooterAutoSpeed", shooter.setAutoSpeed());
     NamedCommands.registerCommand("shooterSubSpeed", shooter.setSubSpeed());
     NamedCommands.registerCommand("shooterStageSpeed", shooter.setStageSpeed());
@@ -141,8 +143,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("armAutoAndShoot", armAutoAndShoot());
     NamedCommands.registerCommand("findNote", autofindNote);
     NamedCommands.registerCommand("enableCamera", runOnce(() -> shooterCamera.useLimelight(true)));
-    drivetrain.configurePathPlanner();
-    robo = new RoboticPathing();
+    NamedCommands.registerCommand("returnToCenter", robo.pathToSub);
+    
 
     //PPHolonomicDriveController.setRotationTargetOverride(Optional.of(getSpeakerRotation()));
 

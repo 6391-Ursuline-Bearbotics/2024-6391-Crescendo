@@ -44,13 +44,37 @@
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "findNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "returnToCenter"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armAutoAndShoot"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "Center to 2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "findNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "returnToCenter"
           }
         },
         {
@@ -63,6 +87,18 @@
           "type": "path",
           "data": {
             "pathName": "Center to 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "findNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "returnToCenter"
           }
         },
         {

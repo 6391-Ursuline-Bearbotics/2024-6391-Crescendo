@@ -8,40 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2013726482388734,
-        "y": 4.596618567119067
+        "x": 1.6793223139219093,
+        "y": 5.081246083780182
       },
       "isLocked": false,
       "linkedName": "CenterStart"
     },
     {
       "anchor": {
-        "x": 2.378649976754284,
-        "y": 4.53799778299438
+        "x": 1.86729904765713,
+        "y": 4.919703578226477
       },
       "prevControl": {
-        "x": 2.003030810331879,
-        "y": 4.830146023545141
-      },
-      "nextControl": {
-        "x": 2.6429922585694374,
-        "y": 4.332398230471482
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 1.27,
-        "y": 5.513288844759509
-      },
-      "prevControl": {
-        "x": 2.26011537753113,
-        "y": 4.552561520149875
+        "x": 1.6616994951342325,
+        "y": 5.095931766103247
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "CenterStart"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
@@ -75,29 +59,6 @@
           ]
         }
       }
-    },
-    {
-      "name": "After Intake",
-      "waypointRelativePos": 1.0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "armSubShootPosition"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "shooterSubSpeed"
-              }
-            }
-          ]
-        }
-      }
     }
   ],
   "globalConstraints": {
@@ -107,8 +68,8 @@
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 0,
+    "velocity": 2.0,
+    "rotation": -46.55000000000001,
     "rotateFast": false
   },
   "reversed": false,

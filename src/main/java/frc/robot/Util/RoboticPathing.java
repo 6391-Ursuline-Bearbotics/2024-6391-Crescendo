@@ -23,6 +23,7 @@ public class RoboticPathing {
   public PathPlannerPath botSpeaker = PathPlannerPath.fromPathFile("Bot Speaker"); */
 
   public Pose2d blueAmp = new Pose2d(1.85, 7.72, new Rotation2d(Units.degreesToRadians(-90)));
+  public Pose2d blueSubwoofer = new Pose2d(1.27, 5.51, new Rotation2d(Units.degreesToRadians(0)));
 
   // Create the constraints to use while pathfinding. The constraints defined in the path will only be used for the path.
   public PathConstraints constraints = new PathConstraints(
@@ -85,4 +86,6 @@ public class RoboticPathing {
   ); */
 
   public Command pathToAmp = AutoBuilder.pathfindToPoseFlipped(blueAmp, constraints);
+
+  public Command pathToSub = AutoBuilder.pathfindToPoseFlipped(blueSubwoofer, constraints);
 }
