@@ -76,6 +76,7 @@ public class RobotContainer {
   public final Climber climb = new Climber();
   private final Command findNote;
   private final Command autofindNote;
+  private final Command autofindNoteLong;
   
   // Field-centric driving in Open Loop, can change to closed loop after characterization 
   // For closed loop replace DriveRequestType.OpenLoopVoltage with DriveRequestType.Velocity
@@ -118,7 +119,10 @@ public class RobotContainer {
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)));
 
     autofindNote = arm.setIntakePosition().andThen(intake.intakeAutoStop()).andThen(new DriveToGamePiece(drivetrain, intakeCamera))
-        .until(() -> intake.getIntakeStop());
+        .until(() -> intake.getIntakeStop()).withTimeout(1);
+
+    autofindNoteLong = arm.setIntakePosition().andThen(intake.intakeAutoStop()).andThen(new DriveToGamePiece(drivetrain, intakeCamera))
+        .until(() -> intake.getIntakeStop()).withTimeout(5);
 
     autoAim.HeadingController.setPID(3.0, 0.0, 0.5);
     autoAim.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
@@ -140,8 +144,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("armAmpPosition", arm.setAmpPosition());
     NamedCommands.registerCommand("intakeOn", intake.intakeAutoStop());
     NamedCommands.registerCommand("armAutoAndShoot", armAutoAndShoot());
-    NamedCommands.registerCommand("findNoteLong", autofindNote.withTimeout(5));
-    NamedCommands.registerCommand("findNote", autofindNote.withTimeout(1));
+    NamedCommands.registerCommand("findNoteLong", autofindNoteLong);
+    NamedCommands.registerCommand("findNote", autofindNote);
     NamedCommands.registerCommand("enableCamera", runOnce(() -> shooterCamera.useLimelight(true)));
     NamedCommands.registerCommand("returnToCenter", robo.pathToSub);
     
