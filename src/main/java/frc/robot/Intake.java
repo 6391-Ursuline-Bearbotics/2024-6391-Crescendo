@@ -72,4 +72,8 @@ public class Intake extends SubsystemBase {
   public Boolean getIntakeStop() {
     return !noteStopSensor.get();
   }
+
+  public Boolean getIntakeSlow() {
+    return !noteSlowSensor.get();
+  }
 }

@@ -118,11 +118,11 @@ public class RobotContainer {
         .withTimeout(5)
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)));
 
-    autofindNote = arm.setIntakePosition().andThen(intake.intakeAutoStop()).andThen(new DriveToGamePiece(drivetrain, intakeCamera))
-        .until(() -> intake.getIntakeStop()).withTimeout(1);
+    autofindNote = arm.setIntakePosition().andThen(intake.intakeOn()).andThen(new DriveToGamePiece(drivetrain, intakeCamera))
+        .until(() -> intake.getIntakeSlow()).andThen(intake.intakeAutoStop()).withTimeout(1);
 
-    autofindNoteLong = arm.setIntakePosition().andThen(intake.intakeAutoStop()).andThen(new DriveToGamePiece(drivetrain, intakeCamera))
-        .until(() -> intake.getIntakeStop()).withTimeout(5);
+    autofindNoteLong = arm.setIntakePosition().andThen(intake.intakeOn()).andThen(new DriveToGamePiece(drivetrain, intakeCamera))
+        .until(() -> intake.getIntakeSlow()).andThen(intake.intakeAutoStop()).withTimeout(5);
 
     autoAim.HeadingController.setPID(3.0, 0.0, 0.5);
     autoAim.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
