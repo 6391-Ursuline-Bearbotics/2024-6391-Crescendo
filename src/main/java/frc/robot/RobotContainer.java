@@ -118,8 +118,7 @@ public class RobotContainer {
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)));
 
     autofindNote = arm.setIntakePosition().andThen(intake.intakeAutoStop()).andThen(new DriveToGamePiece(drivetrain, intakeCamera))
-        .until(() -> intake.getIntakeStop())
-        .withTimeout(5);
+        .until(() -> intake.getIntakeStop());
 
     autoAim.HeadingController.setPID(3.0, 0.0, 0.5);
     autoAim.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
@@ -141,7 +140,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("armAmpPosition", arm.setAmpPosition());
     NamedCommands.registerCommand("intakeOn", intake.intakeAutoStop());
     NamedCommands.registerCommand("armAutoAndShoot", armAutoAndShoot());
-    NamedCommands.registerCommand("findNote", autofindNote);
+    NamedCommands.registerCommand("findNoteLong", autofindNote.withTimeout(5));
+    NamedCommands.registerCommand("findNote", autofindNote.withTimeout(1));
     NamedCommands.registerCommand("enableCamera", runOnce(() -> shooterCamera.useLimelight(true)));
     NamedCommands.registerCommand("returnToCenter", robo.pathToSub);
     
