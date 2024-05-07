@@ -42,7 +42,7 @@ public class Arm extends SubsystemBase {
   private static final double intakePosition = 0.00; // -3.9
   private static final double storePosition = 18;
   private static final double climbPosition = 60.0;
-  private static final double ampPosition = 92.0;
+  private static final double ampPosition = 91.0;
 
   // Arm Contraints
   private static final double kMaxVelocityRadPerSecond = Math.PI / 3; // 90deg per second
@@ -97,7 +97,7 @@ public class Arm extends SubsystemBase {
                         null, // No log consumer, since data is recorded by URCL
                         this));
 
-    m_armFF = new ArmFeedforward(.45, .55, 2.5); // kg .47 kv 4
+    m_armFF = new ArmFeedforward(.35, .58, 2.5); // kg .47 kv 4
 
     m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
         kMaxVelocityRadPerSecond, kMaxAccelerationRadPerSecSquared));
