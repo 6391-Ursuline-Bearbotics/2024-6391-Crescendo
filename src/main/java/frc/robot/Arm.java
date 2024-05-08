@@ -124,9 +124,9 @@ public class Arm extends SubsystemBase {
       SmartDashboard.putNumber("Arm Setpoint", m_state.position * 120.0);
       SmartDashboard.putNumber("Arm Current", m_motor.getOutputCurrent());
       double feedforward = m_armFF.calculate(position * 2 * Math.PI / 3, m_state.velocity);
-      
+
       // Hack designed to remove power near the hardstop so arm doesn't push into it
-      if (position * 120.0 > 5) {
+      if (position * 120.0 > 5 ||  m_state.position * 120.0 > 5) {
         // Add the feedforward to the PID output to get the motor output
         m_pidController.setReference(m_state.position, ControlType.kPosition, 0, feedforward);
       } else {
