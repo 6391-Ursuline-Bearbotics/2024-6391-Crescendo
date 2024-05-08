@@ -10,8 +10,8 @@ import static java.util.Map.entry;
 
 // Interpolating table
 public class InterpolatingTable {
-    public static final ShotParameter sub = new ShotParameter(11, 125); //11 125
-    public static final ShotParameter auto = new ShotParameter(31.2, 140); //31.2 140
+    public static final ShotParameter sub = new ShotParameter(16, 125); //11 125
+    public static final ShotParameter auto = new ShotParameter(33.2, 140); //31.2 140
     public static final ShotParameter stage = new ShotParameter(42.5, 200); //42.5 200
     public static final ShotParameter wing = new ShotParameter(53, 220); // 53 220
     public static final ShotParameter farwing = new ShotParameter(38.3, 142); //38.3 142
