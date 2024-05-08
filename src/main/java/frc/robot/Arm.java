@@ -42,13 +42,13 @@ public class Arm extends SubsystemBase {
   private static final double intakePosition = 0.00; // -3.9
   private static final double storePosition = 18;
   private static final double climbPosition = 60.0;
-  private static final double ampPosition = 91.0;
+  private static final double ampPosition = 90.2;
 
   // Arm Contraints
-  private static final double kMaxVelocityRadPerSecond = Math.PI / 3; // 90deg per second
-  private static final double kMaxAccelerationRadPerSecSquared = Math.PI / 2  ;
+  private static final double kMaxVelocityRadPerSecond = Math.PI / 4; // 90deg per second
+  private static final double kMaxAccelerationRadPerSecSquared = Math.PI / 1.75  ;
   // The value (inverted) when measured parallel to the ground making it 0
-  private static final double kArmOffsetRads = 0.022; //  .028
+  private static final double kArmOffsetRads = 0.028; //  .028
 
   // Profile Setup
   private final TrapezoidProfile m_profile;
@@ -79,9 +79,9 @@ public class Arm extends SubsystemBase {
 
     // Setting up the onboard PID controller on the SparkMAX
     m_pidController = m_motor.getPIDController();
-    m_pidController.setP(.68); // 2
-    m_pidController.setI(0.000);
-    m_pidController.setD(0); //.5
+    m_pidController.setP(1.2); // 2
+    m_pidController.setI(0.0000);
+    m_pidController.setD(.2); //.5
     m_pidController.setIZone(0);
     m_pidController.setFF(0);
 //    m_pidController.setOutputRange(-0.12, 0.22); //allowed output of arm
@@ -97,11 +97,11 @@ public class Arm extends SubsystemBase {
                         null, // No log consumer, since data is recorded by URCL
                         this));
 
-    m_armFF = new ArmFeedforward(.35, .58, 2.5); // kg .47 kv 4
+    m_armFF = new ArmFeedforward(0.35, .55, 3.2); // kg .47 kv 4
 
     m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
         kMaxVelocityRadPerSecond, kMaxAccelerationRadPerSecSquared));
-    double initialPosition = removeWrap(m_absoluteEncoder.getPosition(), storePosition - 2);
+    double initialPosition = removeWrap(m_absoluteEncoder.getPosition(), storePosition - 2); //2 what is this
     m_state = new TrapezoidProfile.State(initialPosition, 0);
     m_goal = new TrapezoidProfile.State(initialPosition, 0);
   }
@@ -117,7 +117,7 @@ public class Arm extends SubsystemBase {
 
     if (!disabled) {
       // Update the Trapezoid profile
-      m_state = m_profile.calculate(0.02, m_state, m_goal);
+      m_state = m_profile.calculate(0.02, m_state, m_goal); //  .01 works better 
       // Calculate the "feedforward" from the current angle turning it into a form of feedback
       position = removeWrap(m_absoluteEncoder.getPosition(), 0);
       SmartDashboard.putNumber("Arm Position", position * 120.0);
