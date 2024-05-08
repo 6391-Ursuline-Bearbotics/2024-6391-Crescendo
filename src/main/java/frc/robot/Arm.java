@@ -101,7 +101,7 @@ public class Arm extends SubsystemBase {
 
     m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
         kMaxVelocityRadPerSecond, kMaxAccelerationRadPerSecSquared));
-    double initialPosition = removeWrap(m_absoluteEncoder.getPosition(), storePosition - 2); //2 what is this
+    double initialPosition = removeWrap(m_absoluteEncoder.getPosition(), (storePosition - 2) / 120.0); //2 what is this
     m_state = new TrapezoidProfile.State(initialPosition, 0);
     m_goal = new TrapezoidProfile.State(initialPosition, 0);
   }
