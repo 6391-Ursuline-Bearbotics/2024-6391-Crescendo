@@ -221,4 +221,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             });
         }
     }
+
+    public Rotation2d getYaw() {
+        return getPigeon2().getRotation2d();
+    }
 }
