@@ -8,6 +8,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
@@ -55,22 +56,23 @@ public class Limelight extends SubsystemBase {
       // 
 
       confidence = 0; // If we don't update confidence then we don't send the measurement
-      LimelightHelpers.SetRobotOrientation(ll, drivetrain.getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation(ll, drivetrain.getState().Pose.getRotation().plus(new Rotation2d(Math.PI)).getDegrees(), 0, 0, 0, 0, 0);
       LimelightHelpers.PoseEstimate limelightMeasurementOld = LimelightHelpers.getBotPoseEstimate_wpiBlue(ll);
       LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(ll);
       SmartDashboard.putNumber("NumTags", limelightMeasurement.tagCount);
 
       // No tag found so check no further or pose not within field boundary
-      if(limelightMeasurement.tagCount >= 1 && fieldBoundary.isPoseWithinArea(limelightMeasurement.pose)) {
+      if(limelightMeasurement.tagCount >= 0 && fieldBoundary.isPoseWithinArea(limelightMeasurement.pose)) {
         // Excluding different measurements that are absolute showstoppers even with full trust 
-        if(limelightMeasurement.avgTagDist < Units.feetToMeters(15) && drivetrain.getState().speeds.omegaRadiansPerSecond < Math.PI) {
+        if(limelightMeasurement.avgTagDist < Units.feetToMeters(155) && drivetrain.getState().speeds.omegaRadiansPerSecond < 9999) {
           // Reasons to blindly trust as much as odometry
           if (trust || DriverStation.isDisabled() || 
               (limelightMeasurement.tagCount >= 0 && limelightMeasurement.avgTagDist < Units.feetToMeters(60))) {
                 confidence = 0.2;
                 trust = false;
           } else {
-            // High trust level anything less than this we shouldn't bother with
+            confidence = 0.7;
+/*             // High trust level anything less than this we shouldn't bother with
             compareDistance = limelightMeasurement.pose.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
             if( compareDistance < 0.5 ||
             (limelightMeasurement.tagCount >= 2 && limelightMeasurement.avgTagDist < Units.feetToMeters(20)) ||
@@ -81,8 +83,8 @@ public class Limelight extends SubsystemBase {
                 tagDistance = tagDistance * 2;
               }
               // Add up to .2 confidence depending on how far away
-              confidence = 0.7 + (tagDistance / 100);
-            }
+              confidence = 0.7 + (tagDistance / 100); */
+            //}
           }
         }
       }
