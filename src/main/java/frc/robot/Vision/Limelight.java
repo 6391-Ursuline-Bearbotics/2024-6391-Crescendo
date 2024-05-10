@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CommandSwerveDrivetrain;
 import frc.robot.Util.RectanglePoseArea;
+import frc.robot.Vision.LimelightHelpers.RawFiducial;
 
 public class Limelight extends SubsystemBase {
   CommandSwerveDrivetrain drivetrain;
@@ -54,7 +55,9 @@ public class Limelight extends SubsystemBase {
       // 
 
       confidence = 0; // If we don't update confidence then we don't send the measurement
-      LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(ll);
+      LimelightHelpers.SetRobotOrientation(ll, drivetrain.getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.PoseEstimate limelightMeasurementOld = LimelightHelpers.getBotPoseEstimate_wpiBlue(ll);
+      LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(ll);
       SmartDashboard.putNumber("NumTags", limelightMeasurement.tagCount);
 
       // No tag found so check no further or pose not within field boundary
@@ -63,7 +66,7 @@ public class Limelight extends SubsystemBase {
         if(limelightMeasurement.avgTagDist < Units.feetToMeters(15) && drivetrain.getState().speeds.omegaRadiansPerSecond < Math.PI) {
           // Reasons to blindly trust as much as odometry
           if (trust || DriverStation.isDisabled() || 
-              (limelightMeasurement.tagCount >= 2 && limelightMeasurement.avgTagDist < Units.feetToMeters(10))) {
+              (limelightMeasurement.tagCount >= 0 && limelightMeasurement.avgTagDist < Units.feetToMeters(60))) {
                 confidence = 0.2;
                 trust = false;
           } else {
@@ -100,7 +103,7 @@ public class Limelight extends SubsystemBase {
     } else {
       SmartDashboard.putBoolean("PoseUpdate", false);
       // We are publishing this to view as a ghost to try and help determine when not to use the LL measurements
-      publishToField(new LimelightHelpers.PoseEstimate(new Pose2d(), 0, 0, 0, 0, 0, 0));
+      publishToField(new LimelightHelpers.PoseEstimate(new Pose2d(), 0, 0, 0, 0, 0, 0, new RawFiducial[0]));
     }
   }
 
