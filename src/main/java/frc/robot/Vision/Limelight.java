@@ -56,7 +56,7 @@ public class Limelight extends SubsystemBase {
       // 
 
       confidence = 0; // If we don't update confidence then we don't send the measurement
-      LimelightHelpers.SetRobotOrientation(ll, drivetrain.getYaw().plus(new Rotation2d(Math.PI)).getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation(ll, drivetrain.getYaw().getDegrees(), 0, 0, 0, 0, 0);
       LimelightHelpers.PoseEstimate limelightMeasurementOld = LimelightHelpers.getBotPoseEstimate_wpiBlue(ll);
       LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(ll);
       SmartDashboard.putNumber("NumTags", limelightMeasurement.tagCount);

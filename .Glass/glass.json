@@ -3,28 +3,27 @@
     "Persistent Values": {
       "open": false
     },
-    "Retained Values": {
-      "open": false
-    },
     "retained": {
-      "SmartDashboard": {
-        "open": true
-      },
       "limelight-tag": {
-        "double[]##v_/limelight-tag/botpose_wpiblue": {
+        "double[]##v_/limelight-tag/camerapose_robotspace": {
           "open": true
-        }
+        },
+        "open": true
       }
     },
     "transitory": {
       "Pose": {
         "double[]##v_/Pose/robotPose": {
           "open": true
-        },
-        "open": true
+        }
       },
       "SmartDashboard": {
         "open": true
+      },
+      "URCL": {
+        "Raw": {
+          "open": true
+        }
       }
     },
     "types": {
