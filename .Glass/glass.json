@@ -7,12 +7,17 @@
       "limelight-tag": {
         "double[]##v_/limelight-tag/camerapose_robotspace": {
           "open": true
-        },
-        "open": true
+        }
       }
     },
     "transitory": {
+      "Drive": {
+        "open": true
+      },
       "Pose": {
+        "double[]##v_/Pose/llPose": {
+          "open": true
+        },
         "double[]##v_/Pose/robotPose": {
           "open": true
         }
@@ -24,6 +29,12 @@
         "Raw": {
           "open": true
         }
+      },
+      "limelight-tag": {
+        "double[]##v_/limelight-tag/robot_orientation_set": {
+          "open": true
+        },
+        "open": true
       }
     },
     "types": {
@@ -134,7 +145,8 @@
         }
       ],
       "window": {
-        "name": "Arm Plot"
+        "name": "Arm Plot",
+        "visible": false
       }
     }
   }
