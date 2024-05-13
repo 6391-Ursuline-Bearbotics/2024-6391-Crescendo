@@ -116,10 +116,11 @@ public class RobotContainer {
     findNote = arm.setIntakePosition().andThen(intake.intakeOn()).andThen(new DriveToGamePiece(drivetrain, intakeCamera))
         .until(() -> SmartDashboard.getBoolean("noteLoaded", false))
         .withTimeout(5)
+        .finallyDo(() -> drivetrain.setControl(drive.withVelocityX(0).withVelocityY(0).withRotationalRate(0)))
         .alongWith(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)));
 
     autofindNote = arm.setIntakePosition().andThen(intake.intakeOn()).andThen(new DriveToGamePiece(drivetrain, intakeCamera))
-        .until(intake.getIntakeSlowSensor()).andThen(intake.intakeAutoStop()).withTimeout(1);
+        .until(intake.getIntakeSlowSensor()).andThen(intake.intakeAutoStop()).withTimeout(2);
 
     autofindNoteLong = arm.setIntakePosition().andThen(intake.intakeOn()).andThen(new DriveToGamePiece(drivetrain, intakeCamera))
         .until(intake.getIntakeSlowSensor()).andThen(intake.intakeAutoStop()).withTimeout(5);
@@ -201,7 +202,7 @@ public class RobotContainer {
     // Set up Driver Controls ================================================
     // Use the intake limelight to drive towards a note and drop the intake right before getting there
     drv.x().and(intake.getIntakeSlowSensor().negate()).and(intake.getIntakeStopSensor().negate()).whileTrue(findNote);
-    drv.x().and(intake.getIntakeSlowSensor().negate()).and(intake.getIntakeStopSensor().negate()).onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
+    drv.x().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // Does full automation while held though the middle of the field
 /*     drv.y().whileTrue(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true)).andThen(either(

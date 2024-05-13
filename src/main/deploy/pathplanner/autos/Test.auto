@@ -46,6 +46,12 @@
           "data": {
             "name": "returnToCenter"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armAutoAndShoot"
+          }
         }
       ]
     }
