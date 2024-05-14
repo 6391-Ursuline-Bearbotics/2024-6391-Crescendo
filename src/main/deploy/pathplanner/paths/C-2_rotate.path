@@ -53,29 +53,6 @@
           ]
         }
       }
-    },
-    {
-      "name": "After Intake",
-      "waypointRelativePos": 1.0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "armSubShootPosition"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "shooterSubSpeed"
-              }
-            }
-          ]
-        }
-      }
     }
   ],
   "globalConstraints": {
