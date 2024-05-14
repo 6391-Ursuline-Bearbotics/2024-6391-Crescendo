@@ -62,7 +62,7 @@ public class Limelight extends SubsystemBase {
       SmartDashboard.putNumber("NumTags", limelightMeasurement.tagCount);
 
       // No tag found so check no further or pose not within field boundary
-      if(limelightMeasurement.tagCount >= 0 && fieldBoundary.isPoseWithinArea(limelightMeasurement.pose)) {
+      if(limelightMeasurement.tagCount > 0 && fieldBoundary.isPoseWithinArea(limelightMeasurement.pose)) {
         // Excluding different measurements that are absolute showstoppers even with full trust 
         if(limelightMeasurement.avgTagDist < Units.feetToMeters(155) && drivetrain.getState().speeds.omegaRadiansPerSecond < 9999) {
           // Reasons to blindly trust as much as odometry
