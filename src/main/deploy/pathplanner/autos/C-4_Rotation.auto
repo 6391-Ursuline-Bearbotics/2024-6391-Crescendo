@@ -26,7 +26,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 3.0
+            "waitTime": 2.0
           }
         },
         {
@@ -36,15 +36,39 @@
           }
         },
         {
-          "type": "sequential",
+          "type": "path",
           "data": {
-            "commands": []
+            "pathName": "C-3_rotate"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armAutoAndShoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C-3_rotate"
+            "pathName": "C-2_rotate"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armAutoAndShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C-1_rotate"
           }
         },
         {
