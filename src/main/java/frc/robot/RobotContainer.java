@@ -144,6 +144,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("armSubShootPosition", arm.setSubShootPosition());
     NamedCommands.registerCommand("armAmpPosition", arm.setAmpPosition());
     NamedCommands.registerCommand("intakeOn", intake.intakeAutoStop());
+    NamedCommands.registerCommand("intakeSlow", intake.intakeSlow());
     NamedCommands.registerCommand("armAutoAndShoot", armAutoAndShoot());
     NamedCommands.registerCommand("findNoteLong", autofindNoteLong);
     NamedCommands.registerCommand("findNote", autofindNote);

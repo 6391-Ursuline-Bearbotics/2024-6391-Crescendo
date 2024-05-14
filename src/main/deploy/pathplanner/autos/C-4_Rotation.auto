@@ -56,7 +56,7 @@
         {
           "type": "named",
           "data": {
-            "name": "intakeOn"
+            "name": "intakeSlow"
           }
         },
         {
