@@ -68,13 +68,13 @@
             {
               "type": "named",
               "data": {
-                "name": "armIntakePosition"
+                "name": "intakeOn"
               }
             },
             {
               "type": "named",
               "data": {
-                "name": "intakeOn"
+                "name": "armIntakePosition"
               }
             }
           ]
