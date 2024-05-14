@@ -44,19 +44,19 @@
         {
           "type": "named",
           "data": {
-            "name": "armSubShootPosition"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "shoot"
+            "name": "armAutoAndShoot"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "C-2_rotate"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeOn"
           }
         },
         {

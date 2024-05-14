@@ -56,7 +56,7 @@ public class Limelight extends SubsystemBase {
       // 
 
       confidence = 0; // If we don't update confidence then we don't send the measurement
-      LimelightHelpers.SetRobotOrientation(ll, drivetrain.getYaw().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation(ll, drivetrain.getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
       LimelightHelpers.PoseEstimate limelightMeasurementOld = LimelightHelpers.getBotPoseEstimate_wpiBlue(ll);
       LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(ll);
       SmartDashboard.putNumber("NumTags", limelightMeasurement.tagCount);
@@ -101,7 +101,7 @@ public class Limelight extends SubsystemBase {
       drivetrain.addVisionMeasurement(
           limelightMeasurement.pose,
           limelightMeasurement.timestampSeconds,
-          VecBuilder.fill(confide, confide, 99));
+          VecBuilder.fill(confide, confide, 9999999));
     } else {
       SmartDashboard.putBoolean("PoseUpdate", false);
       // We are publishing this to view as a ghost to try and help determine when not to use the LL measurements
