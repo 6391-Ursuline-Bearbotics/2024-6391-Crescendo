@@ -21,7 +21,7 @@ public class DriveToGamePiece extends Command {
 
   private Detector ll;
   private CommandSwerveDrivetrain drivetrain;
-  private PIDController thetaController = new PIDController(2.0, 0, 0.05);
+  private PIDController thetaController = new PIDController(114.58, 0, 2.86);
   public DriveToGamePiece(CommandSwerveDrivetrain drivetrain, Detector ll) {
     addRequirements(drivetrain);
     this.drivetrain = drivetrain;
@@ -34,6 +34,7 @@ public class DriveToGamePiece extends Command {
   private double xOutput = 0.2; // Minimum speed to drive towards note
   private final double yOutput = 0;
   private double setpoint = 0;
+  private double currentRotation = 0;
   private Timer blindTimer = new Timer();
   private double vert = 0.0;
   private double xScaled = 0.0;
@@ -42,7 +43,7 @@ public class DriveToGamePiece extends Command {
   @Override
   public void initialize() {
     thetaController.reset();
-    thetaController.setTolerance(Units.degreesToRadians(4));
+    thetaController.setTolerance(4);
     blindTimer.start();
   }
 
@@ -53,11 +54,14 @@ public class DriveToGamePiece extends Command {
       vert = ll.getNoteVertical();
       blindTimer.reset();
 
+      currentRotation = drivetrain.getState().Pose.getRotation().getDegrees();
+      SmartDashboard.putNumber("Game Piece Current", currentRotation);
+
       // Setpoint is the current robot rotation with additional robot relative LL reading
-      setpoint = Math.toRadians(-ll.getNoteHorizontal())+ drivetrain.getState().Pose.getRotation().getRadians();
-      SmartDashboard.putNumber("Game Piece setpoint", setpoint);
-			thetaController.setSetpoint(setpoint);
-      thetaOutput = thetaController.calculate(drivetrain.getState().Pose.getRotation().getRadians(), setpoint);
+      setpoint = -ll.getNoteHorizontal() + currentRotation;
+      SmartDashboard.putNumber("Game Piece Setpoint", setpoint);
+
+      thetaOutput = thetaController.calculate(currentRotation, setpoint);
       SmartDashboard.putNumber("theta output", thetaOutput);
 
       xScaled = xOutput + Math.max((vert + 14) * 0.02, 0); // speed scale
