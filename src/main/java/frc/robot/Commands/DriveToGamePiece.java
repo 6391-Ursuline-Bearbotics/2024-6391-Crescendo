@@ -21,7 +21,7 @@ public class DriveToGamePiece extends Command {
 
   private Detector ll;
   private CommandSwerveDrivetrain drivetrain;
-  private PIDController thetaController = new PIDController(114.58, 0, 2.86);
+  private PIDController thetaController = new PIDController(0.03491, 0, .000872);
   public DriveToGamePiece(CommandSwerveDrivetrain drivetrain, Detector ll) {
     addRequirements(drivetrain);
     this.drivetrain = drivetrain;
