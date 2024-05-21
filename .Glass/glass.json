@@ -11,9 +11,6 @@
       }
     },
     "transitory": {
-      "Drive": {
-        "open": true
-      },
       "Pose": {
         "double[]##v_/Pose/llPose": {
           "open": true
