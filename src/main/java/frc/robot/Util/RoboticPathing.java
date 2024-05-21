@@ -27,8 +27,8 @@ public class RoboticPathing {
 
   // Create the constraints to use while pathfinding. The constraints defined in the path will only be used for the path.
   public PathConstraints constraints = new PathConstraints(
-          TunerConstants.kSpeedAt12VoltsMps, 4.0,
-          Math.PI * 1.5, Units.degreesToRadians(720));
+          1.0, 1.0,
+          Math.PI, Units.degreesToRadians(0));
 
 /*   // Since AutoBuilder is configured, we can use it to build pathfinding commands
   public Command TopAmpRobotic = AutoBuilder.pathfindThenFollowPath(
