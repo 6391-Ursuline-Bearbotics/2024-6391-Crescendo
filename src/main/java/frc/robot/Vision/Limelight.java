@@ -30,6 +30,7 @@ public class Limelight extends SubsystemBase {
   private Boolean trust = false;
   private double confidence = 0;
   private double compareDistance;
+  private Pose2d limelightPoseEstimate;
 
   private final NetworkTable table = NetworkTableInstance.getDefault().getTable("Pose");
   private final DoubleArrayPublisher limelightPub = table.getDoubleArrayTopic("llPose").publish();
@@ -64,31 +65,16 @@ public class Limelight extends SubsystemBase {
       // No tag found so check no further or pose not within field boundary
       if(limelightMeasurement.tagCount > 0 && fieldBoundary.isPoseWithinArea(limelightMeasurement.pose)) {
         // Excluding different measurements that are absolute showstoppers even with full trust 
-        if(limelightMeasurement.avgTagDist < Units.feetToMeters(155) && drivetrain.getState().speeds.omegaRadiansPerSecond < 9999) {
-          // Reasons to blindly trust as much as odometry
-          if (trust || DriverStation.isDisabled() || 
-              (limelightMeasurement.tagCount >= 0 && limelightMeasurement.avgTagDist < Units.feetToMeters(60))) {
-                confidence = 0.2;
-                trust = false;
-          } else {
-            confidence = 0.7;
-/*             // High trust level anything less than this we shouldn't bother with
-            compareDistance = limelightMeasurement.pose.getTranslation().getDistance(drivetrain.getState().Pose.getTranslation());
-            if( compareDistance < 0.5 ||
-            (limelightMeasurement.tagCount >= 2 && limelightMeasurement.avgTagDist < Units.feetToMeters(20)) ||
-            (limelightMeasurement.tagCount == 1 && limelightMeasurement.avgTagDist < Units.feetToMeters(10))) {
-              double tagDistance = Units.metersToFeet(limelightMeasurement.avgTagDist);
-              // Double the distance for solo tag
-              if (limelightMeasurement.tagCount == 1) {
-                tagDistance = tagDistance * 2;
-              }
-              // Add up to .2 confidence depending on how far away
-              confidence = 0.7 + (tagDistance / 100); */
-            //}
-          }
+        if(limelightMeasurement.avgTagDist < Units.feetToMeters(12)) {
+          confidence = 0.5;
+        } else {
+          // If more than 12 ft away use MegaTag 2 use MT if less than 12
+          limelightMeasurement = limelightMeasurementNew;
+          confidence = 0.7;
         }
       }
       addPose(limelightMeasurement, confidence);
+      limelightPoseEstimate = limelightMeasurement.pose;
     }
   }
 
@@ -107,6 +93,10 @@ public class Limelight extends SubsystemBase {
       // We are publishing this to view as a ghost to try and help determine when not to use the LL measurements
       publishToField(new LimelightHelpers.PoseEstimate(new Pose2d(), 0, 0, 0, 0, 0, 0, new RawFiducial[0]));
     }
+  }
+
+  public Pose2d getPoseEstimate() {
+    return limelightPoseEstimate;
   }
 
   private void publishToField(LimelightHelpers.PoseEstimate limelightMeasurement) {

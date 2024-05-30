@@ -213,11 +213,17 @@ public class RobotContainer {
     drv.y().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false))); */
 
     // Drives avoiding obstacles to the Amp
-    drv.b().whileTrue(robo.pathToAmp.alongWith(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true))));
-    drv.b().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
+    //drv.b().whileTrue(robo.pathToAmp.alongWith(runOnce(() -> SmartDashboard.putBoolean("autoControlled", true))));
+    //drv.b().onFalse(runOnce(() -> SmartDashboard.putBoolean("autoControlled", false)));
 
     // While held will stay aimed at the speaker driver still has translation control but not rotation
-    drv.a().whileTrue(drivetrain.run(() -> autoAim()));
+    drv.a().whileTrue(drivetrain.run(() -> autoAim(() -> getRotationTarget(getMovingSpeaker(blue)))));
+
+    // While held stay aimed at the speaker based only on the LL position
+    drv.b().whileTrue(drivetrain.run(() -> autoAim(() -> getLLTarget(getLLSpeaker(blue)))));
+
+    // While held stay aimed at the corner of the field for passing
+    drv.y().whileTrue(drivetrain.run(() -> autoAim(() -> getRotationTarget(getCorner(blue)))));
 
     // Until we have a real robot / sensor this will simulate loading a note
     drv.povUp().onTrue(runOnce(() -> SmartDashboard.putBoolean("noteLoaded", true)));
@@ -452,17 +458,25 @@ public class RobotContainer {
     }
   }
 
-  private Rotation2d getSpeakerRotation() {
-/*     if (!blue) {
-      speaker = Constants.Field.redSpeaker;
-    } else {
-      speaker = Constants.Field.blueSpeaker; //getMovingSpeaker(true);
-    } */
-    speaker = getMovingSpeaker(blue);
+  private Rotation2d getRotationTarget(Translation2d target) {
     Rotation2d currentAngle = drivetrain.getState().Pose.getRotation().plus(new Rotation2d(Math.PI));
-    Rotation2d setpoint = speaker.minus(drivetrain.getState().Pose.getTranslation()).getAngle();
+    Rotation2d setpoint = target.minus(drivetrain.getState().Pose.getTranslation()).getAngle();
     SmartDashboard.putNumber("Auto Aim Robot", currentAngle.getRadians());
     SmartDashboard.putNumber("Auto Aim Setpoint", setpoint.getRadians());
+    return setpoint;
+  }
+
+  private Rotation2d getLLTarget(Translation2d target) {
+    Rotation2d setpoint;
+    var poseLL = shooterCamera.getPoseEstimate();
+    if (poseLL != null) {
+      Rotation2d currentAngle = drivetrain.getState().Pose.getRotation().plus(new Rotation2d(Math.PI));
+      setpoint = target.minus(poseLL.getTranslation()).getAngle();
+      SmartDashboard.putNumber("Auto Aim Robot", currentAngle.getRadians());
+      SmartDashboard.putNumber("Auto Aim Setpoint", setpoint.getRadians());
+    } else {
+      setpoint = null;
+    }
     return setpoint;
   }
 
@@ -478,13 +492,15 @@ public class RobotContainer {
     }
   }
 
-  private void autoAim() {
-    Rotation2d speaker = getSpeakerRotation();
+  private void autoAim(Supplier<Rotation2d> targetSupplier) {
     // The operator perspective stuff inverts everything field oriented
-    if (blue) {
-      speaker = speaker.plus(new Rotation2d(Math.PI));
+    var target = targetSupplier.get();
+    if (target != null) {
+      if (blue) {
+        target = target.plus(new Rotation2d(Math.PI));
+      }
+      drivetrain.setControl(autoAim.withVelocityX(-drv.getLeftY() * MaxSpeed).withVelocityY(-drv.getLeftX() * MaxSpeed).withTargetDirection(target));
     }
-    drivetrain.setControl(autoAim.withVelocityX(-drv.getLeftY() * MaxSpeed).withVelocityY(-drv.getLeftX() * MaxSpeed).withTargetDirection(speaker));
   }
 
   private void robotCentered() {
@@ -498,6 +514,16 @@ public class RobotContainer {
     double x = goalPose.getX() - (robotVel.vxMetersPerSecond * (distanceToSpeaker / Constants.Field.noteVelocity));
     double y = goalPose.getY() - (robotVel.vyMetersPerSecond * (distanceToSpeaker / Constants.Field.noteVelocity));
     return new Translation2d(x, y);
+  }
+
+  public Translation2d getLLSpeaker(boolean blue) {
+    Translation2d goalPose = blue ? Constants.Field.blueSpeaker : Constants.Field.redSpeaker;
+    return goalPose;
+  }
+
+  public Translation2d getCorner(boolean blue) {
+    Translation2d goalPose = blue ? Constants.Field.blueCorner : Constants.Field.redCorner;
+    return goalPose;
   }
 
 /*   public void setLEDs() {

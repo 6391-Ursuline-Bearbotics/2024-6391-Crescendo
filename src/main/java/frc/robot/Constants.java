@@ -14,6 +14,9 @@ public final class Constants {
     public static final Translation2d blueSpeaker = new Translation2d(Units.inchesToMeters(8.5), Units.inchesToMeters(223.42)); // added 5"
     public static final Translation2d redSpeaker = new Translation2d(Units.inchesToMeters(642.73), Units.inchesToMeters(213.42)); // subtracted 5"
 
+    public static final Translation2d blueCorner = new Translation2d(0.0, 0.0);
+    public static final Translation2d redCorner = new Translation2d(16.541, 8.211);
+
     public static final double noteVelocity = 20.0; // We can tune this to get our shots hitting correctly empirically
   }
 }
