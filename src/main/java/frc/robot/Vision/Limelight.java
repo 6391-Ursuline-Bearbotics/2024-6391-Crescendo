@@ -96,7 +96,11 @@ public class Limelight extends SubsystemBase {
   }
 
   public Pose2d getPoseEstimate() {
-    return limelightPoseEstimate;
+    if (confidence == 0) {
+      return null;
+    } else {
+      return limelightPoseEstimate;
+    }
   }
 
   private void publishToField(LimelightHelpers.PoseEstimate limelightMeasurement) {
