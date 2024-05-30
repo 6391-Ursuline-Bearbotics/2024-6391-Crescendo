@@ -17,7 +17,8 @@
         },
         "double[]##v_/Pose/robotPose": {
           "open": true
-        }
+        },
+        "open": true
       },
       "SmartDashboard": {
         "open": true
