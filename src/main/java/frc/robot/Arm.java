@@ -48,7 +48,7 @@ public class Arm extends SubsystemBase {
   private static final double kMaxVelocityRadPerSecond = Math.PI / 4; // 90deg per second
   private static final double kMaxAccelerationRadPerSecSquared = Math.PI / 1.75  ;
   // The value (inverted) when measured parallel to the ground making it 0
-  private static final double kArmOffsetRads = 0.028; //  .028
+  private static final double kArmOffsetRads = 0.03; //  .028
 
   // Profile Setup
   private final TrapezoidProfile m_profile;
