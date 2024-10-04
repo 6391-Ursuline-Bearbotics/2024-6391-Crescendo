@@ -3,7 +3,13 @@
     "Persistent Values": {
       "open": false
     },
+    "Retained Values": {
+      "open": false
+    },
     "retained": {
+      "SmartDashboard": {
+        "open": true
+      },
       "limelight-tag": {
         "double[]##v_/limelight-tag/camerapose_robotspace": {
           "open": true
@@ -11,28 +17,40 @@
       }
     },
     "transitory": {
+      "CameraPublisher": {
+        "limelight-tag": {
+          "open": true
+        }
+      },
+      "PathPlanner": {
+        "open": true
+      },
       "Pose": {
         "double[]##v_/Pose/llPose": {
           "open": true
         },
         "double[]##v_/Pose/robotPose": {
           "open": true
-        },
-        "open": true
-      },
-      "SmartDashboard": {
-        "open": true
+        }
       },
       "URCL": {
         "Raw": {
           "open": true
         }
       },
+      "limelight": {
+        "open": true
+      },
       "limelight-tag": {
-        "double[]##v_/limelight-tag/robot_orientation_set": {
+        "double[]##v_/limelight-tag/botpose_targetspace": {
           "open": true
         },
-        "open": true
+        "double[]##v_/limelight-tag/botpose_wpiblue": {
+          "open": true
+        },
+        "double[]##v_/limelight-tag/robot_orientation_set": {
+          "open": true
+        }
       }
     },
     "types": {

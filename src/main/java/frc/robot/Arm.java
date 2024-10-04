@@ -42,13 +42,14 @@ public class Arm extends SubsystemBase {
   private static final double intakePosition = 0.00; // -3.9
   private static final double storePosition = 18;
   private static final double climbPosition = 60.0;
-  private static final double ampPosition = 90.2;
+  private static final double ampPosition = 94;
 
   // Arm Contraints
   private static final double kMaxVelocityRadPerSecond = Math.PI / 4; // 90deg per second
   private static final double kMaxAccelerationRadPerSecSquared = Math.PI / 1.75  ;
   // The value (inverted) when measured parallel to the ground making it 0
-  private static final double kArmOffsetRads = 0.03; //  .028
+  // This value should actually be slightly above zero to protect against a .999 or .998 or similar reading as this will cause the arm / neo to push into ground causing overamp.
+  private static final double kArmOffsetRads = 0.052; //  .028
 
   // Profile Setup
   private final TrapezoidProfile m_profile;
